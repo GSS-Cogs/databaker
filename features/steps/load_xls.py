@@ -3,6 +3,8 @@ import os
 
 from behave import *
 from pathlib import Path
+import xypath
+
 from databaker.framework import loadxlstabs
 from databaker.jupybakeutils import *
 from databaker.structure_csv_default import *
@@ -64,6 +66,16 @@ def step_impl(context):
 
     for row in context.table:
         context.selections[row[0]] = eval(row[1])
+
+@given('I add a cell value override for the cell "{cell_ref}" in the dimension "{dimension_name}" to the string "{string_value}"')
+def step_impl(context, cell_ref, dimension_name, string_value):
+
+    assert dimension_name in [x.name for x in context.dimensions], f'No "{dimension_name}" dimension found.'
+    dimension_bag = [x for x in context.dimensions if x.name == dimension_name][0]
+    
+    cell_from_bag = [x for x in dimension_bag.hbagset if xypath.contrib.excel.excel_location(x) == cell_ref]
+    assert len(cell_from_bag) == 1, f'Cannot find the cell {cell_ref} in the dimension {dimension_name}'
+    dimension_bag.AddCellValueOverride(cell_from_bag[0], string_value)
 
 @then('the selection for "{variable_name}" should be equal to')
 def step_impl(context, variable_name):

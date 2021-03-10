@@ -39,18 +39,19 @@ class HDim:
         self.name = label
         self.hbagset = hbagset
 
+        self.cellvalueoverride = cellvalueoverride or {} # do not put {} into default value otherwise there is only one static one for everything
+
         # For every dimension, create an appropriate lookup engine
         if constant:
             assert direction is None and strict is None
-            self.engine = ConstantEngine(cellvalueoverride)
+            self.engine = ConstantEngine(self.cellvalueoverride)
         elif strict:
-            self.engine = DirectlyEngine(hbagset, direction, label, cellvalueoverride)
+            self.engine = DirectlyEngine(hbagset, direction, label, self.cellvalueoverride)
         elif not strict:
-            self.engine = ClosestEngine(hbagset, direction, label, cellvalueoverride)
+            self.engine = ClosestEngine(hbagset, direction, label, self.cellvalueoverride)
         else:
             raise ValueError("Aborting. Unable to find appropriate lookup engine.")
             
-        self.cellvalueoverride = cellvalueoverride or {} # do not put {} into default value otherwise there is only one static one for everything
         assert not isinstance(hbagset, str), "Use HDimConst for a single value dimension"
         self.bhbagsetCopied = False
         
