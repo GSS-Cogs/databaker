@@ -9,21 +9,22 @@ from messytables.types import (StringType, IntegerType,
 from messytables.error import ReadError
 from messytables.compat23 import PY2
 
+from dateutil.parser import parse
+
 import openpyxl
 
 class InvalidDateError(Exception):
     pass
 
+# Note xls files only recognise type Float for numbers
 def get_data_type(openpyexcel_cell):
     """
     Map the raw type of the openpyexcel cell to a messytable cell type
     """
-    if isinstance(openpyexcel_cell, float):
+    if isinstance(openpyexcel_cell.value, float) or isinstance(openpyexcel_cell.value, int):
         return FloatType()
-    elif isinstance(openpyexcel_cell, time):
+    elif isinstance(openpyexcel_cell.value, time):
         return DateType(None)
-    elif isinstance(openpyexcel_cell, int):
-        return IntegerType()
     return StringType()
 
 class XLSXTableSet(TableSet):
@@ -80,10 +81,14 @@ class XLSXCell(Cell):
     @staticmethod
     def from_openpyexcel(openpyexcel_cell, sheet, col, row):
         value = openpyexcel_cell.value
+
+        # Note: xls files only recognise type Float for numbers
+        # so cast integers to keep consistant typing across table loaders
+        if isinstance(value, int):
+            value = float(value)
+
         cell_type = get_data_type(openpyexcel_cell)
         
-        from dateutil.parser import parse
-
         if cell_type == DateType(None):
             value = parse(value)
 

@@ -129,14 +129,15 @@ def step_impl(context):
 
     assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(str(actual), str(expected))
 
-@then(u'we confirm the types of the selected cells are of the correct type.')
+@then(u'we confirm the types of the selected cell values are correct')
 def step_impl(context):
     expected = context.text
     types = [type(k.value) for k in context.selections["year"]]
-    actual = set((types))
-    assert len(actual) == 1, "Aborting: more than one type in time selection."
+    types_got = set((types))
+    assert len(types_got) == 1, "Aborting: more than one type in time selection."
+    actual = str(next(iter(types_got)))
 
-    assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(str(actual), str(expected))
+    assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(actual, expected)
 
 
 @then(u'we confirm the cell selection is equal to')

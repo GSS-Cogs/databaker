@@ -9,8 +9,9 @@ Feature: Define dimension using bag.is_date()
         | key        |value                                                        |  
         | year       | tab.excel_ref("A11"+":A250").is_date().is_not_blank()       |
         Then we confirm the cell selection contains "58" cells.
-        And we confirm the types of the selected cells are of the correct type.
+        And we confirm the types of the selected cell values are correct
         """
+        <class 'float'>
         """
         And we confirm the cell selection is equal to:
         """
