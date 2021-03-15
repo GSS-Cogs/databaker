@@ -40,7 +40,6 @@ def loadxlstabs(inputfile, sheetids="*", verbose=True):
         elif inputfile.endswith(".csv"):
             raise NotImplementedError('CSV table loader has not been implemented.')
     except Exception as err:
-        raise err
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')
         tableset = xypath.loader.table_set(inputfile, extension='xls')

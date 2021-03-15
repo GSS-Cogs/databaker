@@ -9,8 +9,6 @@ from messytables.types import (StringType, IntegerType,
 from messytables.error import ReadError
 from messytables.compat23 import PY2
 
-from dateutil.parser import parse
-
 import openpyxl
 
 class InvalidDateError(Exception):

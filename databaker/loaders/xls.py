@@ -7,8 +7,6 @@ from datetime import datetime, time
 import xlrd
 from xlrd.biffh import XLRDError
 
-from dateutil.parser import parse
-
 from messytables.core import RowSet, TableSet, Cell, CoreProperties
 from messytables.types import (StringType, IntegerType,
                                DateType, FloatType)
