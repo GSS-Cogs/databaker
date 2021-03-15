@@ -3,7 +3,7 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
     formatting styles. When I load in a file, I want these formatting styles to be preserved in some manner.
 
     Scenario Outline: Select bold cells from any file type.
-        Given we load an xls file named <File Name>
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key                       | value                           |  
@@ -16,11 +16,11 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+            | "exampleproperties.xlsx"    |
 
 
     Scenario Outline: Select underlined cells from any file type.
-        Given we load an xls file named <File Name>
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key                         | value                   |  
@@ -33,11 +33,11 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+            | "exampleproperties.xlsx"    |
 
 
     Scenario Outline: Select italic cells from any file type.
-        Given we load an xls file named <File Name>
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key                       | value                           |  
@@ -50,11 +50,11 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+            | "exampleproperties.xlsx"    |
 
     
     Scenario Outline: Select struckout cells from any file type.
-        Given we load an xls file named <File Name>
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key                       | value                              |  
@@ -67,78 +67,11 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
-
-
-    Scenario Outline: Select cells with particular font from any file type.
-        Given we load an xls file named <File Name>
-        And select the sheet "Sheet1"
-        And we define cell selections as
-        | key                  | value                    |  
-        | font_selection       | tab.is_font_name()       |
-        Then the selection for "font_selection" should be equal to
-        """
-        ['a 2015']
-        """
-
-        Examples: File Types
-            | File Name                   |
-            | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
-
-    Scenario Outline: Select cells with size property from any file type.
-        Given we load an xls file named <File Name>
-        And select the sheet "Sheet1"
-        And we define cell selections as
-        | key                  | value                    |  
-        | size_selection       | tab.is_size()            |  
-        Then the selection for "size_selection" should be equal to
-        """
-        ['']
-        """
-
-        Examples: File Types
-            | File Name                   |
-            | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
-
-    
-    Scenario Outline: Select cells with particular font colour from any file type.
-        Given we load an xls file named <File Name>
-        And select the sheet "Sheet1"
-        And we define cell selections as
-        | key                         | value                      |  
-        | font_colour_selection       | tab.is_font_colour()       |
-        Then the selection for "font_colour_selection" should be equal to
-        """
-        ['']
-        """
-
-        Examples: File Types
-            | File Name                   |
-            | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
-
-
-    Scenario Outline: Select cells with particular background colour from any file type.
-        Given we load an xls file named <File Name>
-        And select the sheet "Sheet1"
-        And we define cell selections as
-        | key                         | value                            |  
-        | back_colour_selection       | tab.is_background_colour()       |
-        Then the selection for "back_colour_selection" should be equal to
-        """
-        ['']
-        """
-
-        Examples: File Types
-            | File Name                   |
-            | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+            | "exampleproperties.xlsx"    |
 
 
     Scenario Outline: Select cells with any border from any file type.
-        Given we load an xls file named <File Name>
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key                         | value                     |  
@@ -155,7 +88,7 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
 
 
     Scenario Outline: Select cells with all borders from any file type.
-        Given we load an xls file named <File Name>
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key                         | value                     |  
@@ -170,19 +103,19 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
             | "exampleproperties.xls"     |
             #| "exampleproperties.xlsx"    |
 
-
-    Scenario Outline: Select cells with formatting string from any file type.
-        Given we load an xls file named <File Name>
+    Scenario Outline: Select all non-blank cells
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
-        | key                               | value                            |  
-        | formatting_string_selection       | tab.is_formatting_string()       |
-        Then the selection for "formatting_string_selection" should be equal to
+        | key                         | value                     |  
+        | non_blank_selection         | tab.excel_ref("C").is_not_blank()       |
+        Then the selection for "non_blank_selection" should be equal to
         """
-        ['']
+        ['12015', '2015', '20152', 'Any border', 'This is Italic']
         """
 
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+            | "exampleproperties.xlsx"    |
+

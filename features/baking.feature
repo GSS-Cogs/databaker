@@ -4,8 +4,8 @@ single observation per row.
     Using this I then want to make a pandas dataframe which stores a single observation
     per row with the correct dimension values.
 
-    Scenario: Complete the databaking process - produce a correct dataframe.
-        Given we load an xls file named "bakingtestdataset.xls"
+    Scenario Outline: Complete the databaking process - produce a correct dataframe.
+        Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
         | key             | value                                   |  
@@ -37,3 +37,8 @@ single observation per row.
         And we convert the ConversionSegment object into a pandas dataframe.
         And we have the file "baking_test.csv" transformed back into a pandas dataframe.
         Then the two dataframes should be identical.
+
+        Examples: File Types
+            | File Name                   |
+            | "bakingtestdataset.xls"     |
+            | "bakingtestdataset.xlsx"    |

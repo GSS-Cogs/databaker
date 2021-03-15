@@ -1,14 +1,21 @@
+import logging
 import os, warnings
+from io import BytesIO
 import xypath
 import xypath.loader
 import databaker.constants
 from databaker.constants import *      # also brings in template
 import databaker.overrides as overrides       # warning: injects additional class functions into xypath and messytables
 
+from pathlib import PosixPath
+
 # core classes and functionality
 from databaker.jupybakeutils import HDim, HDimConst, ConversionSegment, Ldatetimeunitloose, Ldatetimeunitforce, pdguessforceTIMEUNIT
 from databaker.jupybakecsv import writetechnicalCSV, readtechnicalCSV
 from databaker.jupybakehtml import savepreviewhtml
+
+from databaker.loaders.xlsx import XLSXTableSet
+from databaker.loaders.xls import XLSTableSet
 
 # this lot should be deprecated
 from databaker.jupybakecsv import headersfromwdasegment, extraheaderscheck, checktheconstantdimensions, checksegmentobsvalues
@@ -17,8 +24,30 @@ from databaker.jupybakecsv import wdamsgstrings, CompareConversionSegments
 def loadxlstabs(inputfile, sheetids="*", verbose=True):
     if verbose:
         print("Loading %s which has size %d bytes" % (inputfile, os.path.getsize(inputfile)))
-    tableset = xypath.loader.table_set(inputfile, extension='xls')
+    
+    # TODO - take string name, path or fileobject
+    if type(inputfile) == PosixPath:
+        inputfile = str(inputfile.absolute())
+
+    # Fall back on messytables defaults if our local table loaders fail
+    try:
+        if inputfile.endswith(".xlsx"):
+            tableset = XLSXTableSet(filename=inputfile)
+        elif inputfile.endswith(".xls"):
+            tableset = XLSTableSet(filename=inputfile)
+        elif inputfile.endswith(".ods"):
+            raise NotImplementedError('ODS table loader has not been implemented.')
+        elif inputfile.endswith(".csv"):
+            raise NotImplementedError('CSV table loader has not been implemented.')
+    except Exception as err:
+        logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
+                        'Falling through to default messytables table loader.')
+        tableset = xypath.loader.table_set(inputfile, extension='xls')
+    
+
+
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
+    
     tabnames = [ tab.name  for tab in tabs ]
     if verbose:
         print("Table names: %s" % str(tabnames))

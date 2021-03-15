@@ -1,8 +1,8 @@
-Feature: Load xls files
-  I want to load xls files into databaker
+Feature: Load xlsx files
+  I want to load xlsx files into databaker
 
-  Scenario: Load xls file 1
-    Given we load a file named "2018internationaltradeinservicesdatatables.xls"
+  Scenario: Load xlsx file 1
+    Given we load a file named "2018internationaltradeinservicesdatatables.xlsx"
     Then we confirm the names of the loaded tabs are equal to:
     """
     ["Notes", "Index", "1. NUTS1, industry", "2. NUTS1, industry, destination",
@@ -12,4 +12,10 @@ Feature: Load xls files
     And the output "some_name" should be equal to:
     """
     1. NUTS1, industry
-    """ 
+    """
+
+    # "2018internationaltradeinservicesdatatables.xlsx"
+    # "bulletindataset2v2.xlsx"
+    # "exampleproperties.xlsx"
+    # "balanceofpayments2020q1.xlsx"
+    

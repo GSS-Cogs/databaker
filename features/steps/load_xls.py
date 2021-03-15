@@ -9,6 +9,7 @@ from databaker.structure_csv_default import *
 from databaker.constants import *
 from databaker.overrides import *
 
+
 def get_fixture(file_name):
     """Helper to get specific files out of the fixtures dir"""
     feature_path = Path(os.path.dirname(os.path.abspath(__file__))).parent
@@ -31,7 +32,7 @@ def cell_builder(cell_list):
             cell_set.add(cell)
     return(cell_set)
 
-@given('we load an xls file named "{xls_file}"')
+@given('we load a file named "{xls_file}"')
 def step_impl(context, xls_file):
     path_to_xls = get_fixture(xls_file)
     context.last_xls_loaded = path_to_xls
@@ -128,13 +129,21 @@ def step_impl(context):
 
     assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(str(actual), str(expected))
 
+@then(u'we confirm the types of the selected cells are of the correct type.')
+def step_impl(context):
+    expected = context.text
+    types = [type(k.value) for k in context.selections["year"]]
+    actual = set((types))
+    assert len(actual) == 1, "Aborting: more than one type in time selection."
+
+    assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(str(actual), str(expected))
+
 
 @then(u'we confirm the cell selection is equal to')
 def step_impl(context):
     #expected = str(context.text).strip()
     #values = [v for v in context.selections.values()]
     #actual = str(values[0])
-
     #assert expected == actual, "{} \n\ndoes not match the expected output \n\n {}\n".format(str(actual), str(expected))
     expected = set()
     #temp_actual = []
