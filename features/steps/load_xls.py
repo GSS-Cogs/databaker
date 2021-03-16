@@ -179,6 +179,7 @@ def step_impl(context):
 
 @then(u'we confirm the cell selection contains "{num_of_cells}" cells.')
 def step_impl(context, num_of_cells):
+    print(context.selections)
     assert len(cell_builder(str([str(v) for v in context.selections.values()][0]))) == int(num_of_cells), "{} \n\nbag contains unexpected number of cells \n\n {}\n".format(len(cell_builder(str([str(v) for v in context.selections.values()][0]))), str(num_of_cells))
 
 

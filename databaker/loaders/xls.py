@@ -16,16 +16,18 @@ from messytables.compat23 import PY2
 class InvalidDateError(Exception):
     pass
 
-# Note xls files only recognise type Float for numbers
-def get_data_type(xlrd_cell_value):
-    """
-    Map the raw type of the openpyexcel cell to a messytable cell type
-    """
-    if isinstance(xlrd_cell_value, float) or isinstance(xlrd_cell_value, int):
-        return FloatType()
-    elif isinstance(xlrd_cell_value, time):
-        return DateType(None)
-    return StringType()
+XLS_TYPES = {
+    1: StringType(),
+    # NB: Excel does not distinguish floats from integers so we use floats
+    # We could try actual type detection between floats and ints later
+    # or use the excel format string info - see
+    # https://groups.google.com/forum/?fromgroups=#!topic/
+    #  python-excel/cAQ1ndsCVxk
+    2: FloatType(),
+    3: DateType(None),
+    # this is actually boolean but we do not have a boolean type yet
+    4: IntegerType()
+}
 
 
 class XLSTableSet(TableSet):
@@ -119,10 +121,17 @@ class XLSCell(Cell):
     @staticmethod
     def from_xlrdcell(xlrd_cell, sheet, col, row):
         value = xlrd_cell.value
-        cell_type = get_data_type(xlrd_cell.value)
+        cell_type = XLS_TYPES.get(xlrd_cell.ctype, StringType())
     
         if cell_type == DateType(None):
-            value = parse(value)
+            if value == 0:
+                raise InvalidDateError
+            year, month, day, hour, minute, second = \
+                xlrd.xldate_as_tuple(value, sheet.book.datemode)
+            if (year, month, day) == (0, 0, 0):
+                value = time(hour, minute, second)
+            else:
+                value = datetime(year, month, day, hour, minute, second)
                 
         messy_cell = XLSCell(value, type=cell_type)
         messy_cell.sheet = sheet

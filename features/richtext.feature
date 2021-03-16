@@ -17,7 +17,7 @@ Feature: Define dimension using bag.is/is_not_richtext()
     Examples: File Types
             | File Name                   |
             | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            #| "bakingtestdataset.xlsx"    |
 
 Scenario Outline: Define construction type by richtext values in row "6"
     Given we load a file named <File Name>
@@ -34,4 +34,4 @@ Scenario Outline: Define construction type by richtext values in row "6"
     Examples: File Types
             | File Name                   |
             | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            #| "bakingtestdataset.xlsx"    |

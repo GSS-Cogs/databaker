@@ -43,10 +43,6 @@ class XLSXTableSet(TableSet):
             raise Exception('You must provide one of filename or fileobj')
 
         self.workbook = get_workbook()
-        if self.workbook.epoch == openpyxl.utils.datetime.CALENDAR_WINDOWS_1900:
-            print("1900")
-        else:
-            print("Not 1900")
 
     def make_tables(self):
         """ Return the sheets in the workbook. """
@@ -85,10 +81,13 @@ class XLSXCell(Cell):
         if isinstance(value, int):
             value = float(value)
 
+        # Note: Openpyxl registers whitespace as 'None' whereas xlrd uses 
+        # an empty string (''). Changing None values to empty strings here
+        # allows us to use xypaths .is/is_not_whitespace() functions.
+        if value == None:
+            value = ''
+
         cell_type = get_data_type(openpyexcel_cell)
-        
-        if cell_type == DateType(None):
-            value = parse(value)
 
         messy_cell = XLSXCell(value, type=cell_type)
         messy_cell.sheet = sheet
@@ -126,8 +125,7 @@ class XLSXProperties(CoreProperties):
     def get_blank(self):
         """Note that cells might not exist at all.
            Behaviour for spanned cells might be complicated: hence this function"""
-        return self.cell.value == None
-        #return self.cell.openpyexcel_cell.cell.value == ''
+        return self.cell.value == ''
         
     def get_strikeout(self):
         return self.cell.openpyexcel_cell.font.strike
@@ -163,4 +161,5 @@ class XLSXProperties(CoreProperties):
         #return self.cell.sheet.rich_text_runlist_map.get(self.cell.xlrd_pos, None)
 
     def get_richtext(self):
-        return bool(self.rich)
+        raise NotImplementedError
+        #return bool(self.rich)
