@@ -235,8 +235,10 @@ Break points": {ordered_break_point_list}
             self.index = None
 
             # Apply str level cell value override if applicable
-            if r["dimension_cell"].value in self.cellvalueoverride.keys():
+            if r["dimension_cell"].value in self.cellvalueoverride:
                 value = self.cellvalueoverride[r["dimension_cell"].value]
+            elif r["dimension_cell"]._cell in self.cellvalueoverride:
+                value = self.cellvalueoverride[r["dimension_cell"]._cell]
             else:
                 value = r["dimension_cell"].value
 

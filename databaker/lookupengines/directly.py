@@ -142,8 +142,10 @@ class DirectlyEngine(object):
                     if self.last_cell_found is not None:
 
                         # Apply str level cell value override if applicable
-                        if self.last_cell_found.value in self.cellvalueoverride.keys():
+                        if self.last_cell_found.value in self.cellvalueoverride:
                             value = self.cellvalueoverride[self.last_cell_found.value]
+                        elif self.last_cell_found._cell in self.cellvalueoverride:
+                            value = self.cellvalueoverride[self.last_cell_found._cell]
                         else:
                             value = self.last_cell_found.value
 
