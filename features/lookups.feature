@@ -92,5 +92,5 @@ Scenario: Create a WITHIN ABOVE dimensionsional lookup
         """
         HDim(cats_and_dogs, "Cats And Dogs", WITHIN(LEFT=1, RIGHT=1), ABOVE)
         """
-    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "<E3 'Cats'>"
-    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "<H3 'Dogs'>"
+    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<H3 'Dogs'>}"

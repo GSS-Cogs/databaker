@@ -229,11 +229,15 @@ class WithinEngine(object):
             elif self.direction_of_travel == (1, 0):
                 for y_offset in range(self.table_height, -1, -1):
                     for x_offset in range(0, self.table_width+1, 1):
-                        possible_cell_as_list = [cell for cell in pristine_table if cell.x == x_offset and cell.y == y_offset]
-                        assert len(possible_cell_as_list) == 1, f'Pristine table is {pristine_table}'
-                        possible_cell = possible_cell_as_list[0]
-                        is_in_dimension = len([cell for cell in cell_bag if cell.x == possible_cell.x and cell.y == possible_cell.y]) > 0
-                        sequence.append(possible_cell if is_in_dimension else NoneCell(x=x_offset, y=y_offset))
+                        potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                        if len(potential_cell) == 1:
+                            sequence.append(potential_cell[0])
+
+                        #possible_cell_as_list = [cell for cell in pristine_table if cell.x == x_offset and cell.y == y_offset]
+                        #possible_cell = possible_cell_as_list[0]
+                        ##assert len(possible_cell_as_list) == 1, f'Pristine table is {pristine_table}'
+                        #is_in_dimension = len([cell for cell in cell_bag if cell.x == possible_cell.x and cell.y == possible_cell.y]) > 0
+                        #sequence.append(possible_cell if is_in_dimension else NoneCell(x=x_offset, y=y_offset))
             else:
                 raise ValueError(f'A direction of travel of {self.direction_of_travel} is incomptible with an ABOVE directed lookup')
 
@@ -247,25 +251,25 @@ class WithinEngine(object):
         Note: see the docstring for _sequencer for a explanation of how this works
         """
 
-        start_cell = [x for x in self.sequence if x.x == cell.x-self.starting_offset and x.y == cell.y][0]
-        start_at = self.sequence.index(start_cell)
-
         found_cell = None
-        for i in range(0, len(self.sequence)):
-            if self.sequence[i].x < cell.x-self.starting_offset:
-                continue
-            if not isinstance(self.sequence[i], NoneCell):
-                found_cell = self.sequence[i]
-                break
 
+        for sequenced_cell in self.sequence:
+
+            if self.direction_of_travel == (1, 0):
+                if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset+1:
+                    found_cell = sequenced_cell
+                    break
+            else:
+                raise Exception(f'No handling for direction of travel {self.direction_of_travel}.')
+                
         if found_cell is None:
-            raise ValueError(f'Unsuccessful withing lookup for cell {cell} in dimension {self.label}')
+            raise ValueError(f'Unsuccessful withing lookup for cell {cell} in dimension {self.label}. Sequence is {self.sequence}')
 
         # Apply str level cell value override if applicable
         if found_cell.value in self.cellvalueoverride:
             value = self.cellvalueoverride[found_cell.value]
-        elif found_cell in self.cellvalueoverride:
-            value = self.cellvalueoverride[found_cell]
+        elif found_cell._cell in self.cellvalueoverride:
+            value = self.cellvalueoverride[found_cell._cell]
         else:
             value = found_cell.value
 
