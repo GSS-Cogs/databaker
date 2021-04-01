@@ -80,3 +80,17 @@ Scenario: Create a CONSTANT dimension
         """
     Then all lookups to dimension "Constant1" should return the value "foo"
     And all lookups to dimension "Constant2" should return the value "bar"
+
+Scenario: Create a WITHIN ABOVE dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(LEFT=1, RIGHT=1), ABOVE)
+        """
+    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "<E3 'Cats'>"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "<H3 'Dogs'>"

@@ -11,6 +11,7 @@ from databaker.constants import ABOVE, BELOW, LEFT, RIGHT
 from databaker.lookupengines.closest import ClosestEngine
 from databaker.lookupengines.directly import DirectlyEngine
 from databaker.lookupengines.constant import ConstantEngine
+from databaker.lookupengines.within import WITHIN, WithinEngine
 
 try:   
     import pandas
@@ -42,7 +43,13 @@ class HDim:
         self.cellvalueoverride = cellvalueoverride or {} # do not put {} into default value otherwise there is only one static one for everything
 
         # For every dimension, create an appropriate lookup engine
-        if constant:
+
+        # TODO - I dislike this old repackaging of strict as its referring to a boolean and we're rending that nonsensical by
+        # sometimes passing a WITHIN object, nevertheless it'll do for now
+        if isinstance(strict, WITHIN):
+            starting_offset, ending_offset, direction_of_travel = strict.unpack()
+            self.engine = WithinEngine(hbagset, direction, label, starting_offset, ending_offset, direction_of_travel, self.cellvalueoverride)
+        elif constant:
             assert direction is None and strict is None
             self.engine = ConstantEngine(self.cellvalueoverride)
         elif strict:

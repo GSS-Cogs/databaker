@@ -273,3 +273,27 @@ Expected:
 {expected_err_str}
         """
         assert got_err_str == expected_err_str, msg
+
+@then('the lookup from an observation in cell "{ob_cell_excel_ref}" to the dimension "{dimension_name}" returns "{expecting}"')
+def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
+    dimension = [x for x in context.dimensions if x.name == dimension_name]
+    assert len(dimension) == 1, f'Could not find a dimension named {dimension_name}'
+    dimension = dimension[0]
+
+    observation_selection = [context.selections[x] for x in context.selections if x == "observations"][0]
+    ob_cell = None
+    for cell in observation_selection:
+        if xypath.contrib.excel.excel_location(cell) == ob_cell_excel_ref:
+            ob_cell = cell
+            break
+    else:
+        raise ValueError(f'Could not find a selected observation cell for excel reference {ob_cell_excel_ref}')
+
+    assert ob_cell is not None
+
+    looked_up_cell, _ = dimension.celllookup(ob_cell)
+    assert str(looked_up_cell) == expecting, f'Got {str(looked_up_cell)}, expected {expecting}'
+
+@then('raise')
+def step_impl(context):
+    assert True is False
