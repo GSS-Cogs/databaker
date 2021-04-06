@@ -1,8 +1,4 @@
 
-import logging
-
-from typing import NamedTuple
-
 from databaker.constants import ABOVE, BELOW, UP, DOWN, LEFT, RIGHT, DIRECTION_DICT
 
 # Essentially a factory function for the actual WithinEngine
