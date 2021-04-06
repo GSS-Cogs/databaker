@@ -33,7 +33,7 @@ class WITHIN(object):
         msg2 = "You can't use a {} keyword without a corresponding {} keyword"
         if above is not None:
             assert all(x is None for x in [left, right]), msg1.format("left and right", "above")
-            assert below is not None, msg2.format("above", "right")
+            assert below is not None, msg2.format("above", "below")
 
         if below is not None:
             assert all(x is None for x in [left, right]), msg1.format("left and right", "below")
@@ -189,19 +189,6 @@ class WithinEngine(object):
         # I doubt this is even remotely efficient (so lets get the tests working, then we're free to rip the following to bits and make it faster)
         sequence = []
 
-        """
-        for my sanity, delete me later
-        UP = (0, -1)
-        RIGHT = (1, 0)
-        DOWN = (0, 1)
-        LEFT = (-1, 0)
-        """
-
-        # Scenario 1: Scanning leftwards by row moving upwards from the bottom right of the table
-        #if self.direction == ABOVE and self.direction_of_travel == LEFT:
-        #    for y_offset in range(self.table_height, -1, -1):           # work upwards from last row
-        #        for x_offset in range(self.table_width, -1, -1):        # work left from rightmost cell
-
         if self.direction == ABOVE and self.direction_of_travel == LEFT:
             for (x_offset, y_offset) in self._xy_traveling_up_and_left():
                 potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
@@ -236,7 +223,7 @@ class WithinEngine(object):
 
         # TODO - think!
         # We've got things into the right sequence so this will work, but given we know the absolute width and height of the
-        # table can we shortcut this? Feels like theres some logic hack to be found here to start us off a better informed /
+        # table can we shortcut this? Feels like there might be some logic hack to be found here to start us off a better informed /
         # close to the mark point in the sequence.
         
         found_cell = None
@@ -250,7 +237,7 @@ class WithinEngine(object):
                         f' and we were scanning {DIRECTION_DICT[self.direction_of_travel]} but no header cell was found in the specified range.')
 
 
-        # TODO, dev note. The below is happening in all 3 engines, wrap it in a helper function, DRY etc.
+        # TODO, dev note. The below is happening in all engines other than constant, wrap it in a helper function, DRY etc.
 
         # Apply str level cell value override if applicable
         if found_cell.value in self.cellvalueoverride:
