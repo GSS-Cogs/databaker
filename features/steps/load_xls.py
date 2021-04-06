@@ -293,7 +293,3 @@ def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
 
     looked_up_cell, _ = dimension.celllookup(ob_cell)
     assert str(looked_up_cell) == expecting, f'Got {str(looked_up_cell)}, expected {expecting}'
-
-@then('raise')
-def step_impl(context):
-    assert True is False
