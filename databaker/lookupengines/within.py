@@ -1,11 +1,9 @@
 
+import logging
+
 from typing import NamedTuple
 
-from databaker.constants import ABOVE
-
-class NoneCell(NamedTuple):
-    x: int
-    y: int
+from databaker.constants import ABOVE, BELOW, UP, DOWN, LEFT, RIGHT, DIRECTION_DICT
 
 # Essentially a factory function for the actual WithinEngine
 # I don't particularly like breaking the python convention of UPPERCLASS == a constant
@@ -19,77 +17,70 @@ class WITHIN(object):
 
         We're aiming to get the variables:
         -----------------------------------
-        direction_of_travel - are we scanning the cells going left, right, up or down?
+        direction_of_travel - are we scanning the cells going LEFT, RIGHT, UP or DOWN?
         starting_offset - how many x or y offsets away (relative to an observation) do we start looking?
         ending_offset  - how many x or y offsets away (relative to an observation) do we finish looking?
 
         And provide them on demand via the unpack() method
         """
 
-        assert len(kwargs) == 2, 'WITHIN requires exactly 2 keyword argument. Either ABOVE & BELOW or LEFT & RIGHT (order can be switched)'
+        assert len(kwargs) == 2, 'WITHIN requires exactly 2 keyword argument. Either above & below or left & right (order can be switched)'
 
         # Unpack the kwargs
-        ABOVE = kwargs.get("ABOVE", None)
-        LEFT = kwargs.get("LEFT", None)
-        RIGHT = kwargs.get("RIGHT", None)
-        BELOW = kwargs.get("BELOW", None)
+        above = kwargs.get("above", None)
+        left = kwargs.get("left", None)
+        right = kwargs.get("right", None)
+        below = kwargs.get("below", None)
 
         # Check we've been passed sane combinations of keywords
         msg1 = "You can't pass keywords of {} if you're also passing {}"
         msg2 = "You can't use a {} keyword without a corresponding {} keyword"
-        if ABOVE is not None:
-            assert all(v is None for v in [LEFT, RIGHT]), msg1.format("LEFT and RIGHT", "ABOVE")
-            assert BELOW is not None, msg2.format("ABOVE", "BELOW")
+        if above is not None:
+            assert all(x is None for x in [left, right]), msg1.format("left and right", "above")
+            assert below is not None, msg2.format("above", "right")
 
-        if BELOW is not None:
-            assert all(v is None for v in [LEFT, RIGHT]), msg1.format("LEFT and RIGHT", "BELOW")
-            assert ABOVE is not None, msg2.format("BELOW", "ABOVE")
+        if below is not None:
+            assert all(x is None for x in [left, right]), msg1.format("left and right", "below")
+            assert above is not None, msg2.format("below", "above")
 
-        if RIGHT is not None:
-            assert all(v is None for v in [ABOVE, BELOW]), msg1.format("ABOVE and BELOW", "RIGHT")
-            assert LEFT is not None, msg2.format("RIGHT", "LEFT")
+        if right is not None:
+            assert all(x is None for x in [above, below]), msg1.format("above and below", "right")
+            assert left is not None, msg2.format("right", "left")
 
-        if LEFT is not None:
-            assert all(v is None for v in [ABOVE, BELOW]), msg1.format("ABOVE and BELOW", "LEFT")
-            assert RIGHT is not None, msg2.format("LEFT", "RIGHT")
+        if left is not None:
+            assert all(x is None for x in [above, below]), msg1.format("above and below", "left")
+            assert right is not None, msg2.format("left", "right")
 
-        """
-        delete me
-        UP = (0, -1)
-        RIGHT = (1, 0)
-        DOWN = (0, 1)
-        LEFT = (-1, 0)
-        """
         # Get the direction of travel, this is dependant on the order in which the keyword args are passed
-        # e.g (LEFT=1, RIGHT=2) is traveling RIGHT, while (RIGHT=1, LEFT=1) is travelling LEFT
-        if LEFT is not None:
+        # e.g (left=1, right=2) is traveling RIGHT, while (right=1, left=1) is travelling LEFT
+        if left is not None:
             # Consider the kwargs in the order they were recieved
             for k, v in kwargs.items():
-                if k == "LEFT":
-                    self.starting_offset = kwargs["LEFT"]  # the integer passed
-                    self.ending_offset = kwargs["RIGHT"]
-                    self.direction_of_travel = (1, 0)   # RIGHT, expressed in xy terms
+                if k == "left":
+                    self.starting_offset = kwargs["left"]
+                    self.ending_offset = kwargs["right"]
+                    self.direction_of_travel = RIGHT
                     break
-                if k == "RIGHT":
-                    self.starting_offset = kwargs["RIGHT"]
-                    self.ending_offset = kwargs["LEFT"]
-                    self.direction_of_travel = (-1, 0)   # LEFT, expressed in xy terms
+                if k == "right":
+                    self.starting_offset = kwargs["right"]
+                    self.ending_offset = kwargs["left"]
+                    self.direction_of_travel = LEFT
                     break
-        elif ABOVE is not None:
+        elif above is not None:
             for k, v in kwargs.items():
-                if k == "ABOVE":
-                    self.starting_offset = kwargs["ABOVE"]
-                    self.ending_offset = kwargs["BELOW"]
-                    self.direction_of_travel = (0, 1)   # DOWN, expressed in xy terms
+                if k == "above":
+                    self.starting_offset = kwargs["above"]
+                    self.ending_offset = kwargs["below"]
+                    self.direction_of_travel = DOWN
                     break
-                if k == "BELOW":
-                    self.starting_offset = kwargs["BELOW"]
-                    self.ending_offset = kwargs["ABOVE"]
-                    self.direction_of_travel = (0, -1)   # UP, expressed in xy terms
+                if k == "below":
+                    self.starting_offset = kwargs["below"]
+                    self.ending_offset = kwargs["above"]
+                    self.direction_of_travel = UP
                     break
         else:
-            raise ValueError('Invalid keywords passed to WITHIN engine.You must have either LEFT'
-                    + ' and RIGHT, or ABOVE and BELOW keywords.')
+            raise ValueError('Invalid keywords passed to WITHIN engine.You must have either the "left"'
+                    + ' and "right", or "above" and "below" keywords.')
 
         # In case someone does something silly
         assert isinstance(self.starting_offset, int), f'The parameters passed to the {",".join(kwargs)} keywords must be integers'
@@ -120,7 +111,7 @@ class WithinEngine(object):
         is both LEFT and RIGHT, realtive to a given observation.
 
         Consider the following code:
-        HDim(cells, "Dimensions 1, WITHIN(LEFT=1, RIGHT=1), ABOVE)
+        HDim(cells, "Dimensions 1, WITHIN(left=1, right=1), ABOVE)
 
         This is specifying age is above the observation, but only within the range of
         one to the left through 1 to the right.
@@ -129,15 +120,14 @@ class WithinEngine(object):
         cell via the following pattern.
 
         |   A  |  B   |  C   |  D   |
-        |      |      |      |      |
+        |------|------|------|------|
         |   7  |  8   |  9   |      |
         |   4  |  5   |  6   |      |
         |   1  |  2   |  3   |      |
         |      |  ob  |      |      |
 
         With the header cell we're "looking up" being the first of the cells we've labelled
-        1-9 (in that order) that is a cell we've also selected as being part of the "Age" dimension,
-        relative to the observation in question (the cell marked "ob" in this example).
+        1-9 (in that order) that is a cell we've also selected as being part of the "Age" dimension.
         """
 
         # Store all the things
@@ -150,6 +140,26 @@ class WithinEngine(object):
         self.cell_bag = cell_bag
 
         self.sequence = self._sequencer(cell_bag)  # see docstring
+
+    # test me!
+    def _xy_traveling_up_and_right(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling left to right from the bottom row to the top row
+        """
+        for y_offset in range(self.table_height, -1, -1):
+            for x_offset in range(0, self.table_width+1, 1):
+                yield x_offset, y_offset
+
+    # test me!
+    def _xy_traveling_up_and_left(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling right to left from the bottom row to the top row
+        """
+        for y_offset in range(self.table_height, -1, -1):
+            for x_offset in range(self.table_width, -1, -1):
+                yield x_offset, y_offset
 
     def _sequencer(self, cell_bag):
         """
@@ -168,32 +178,9 @@ class WithinEngine(object):
 
         Whereas with a lookup of BELOW and direction of travel RIGHT->LEFT it would be
         [baz, bar, foo, peter, egon, ray, mo, curly, larry]
-
-        This is to allow us to consume the appropriate cells via their range. So with the
-        original ABOVE and LEFT->RIGHT sequence
-
-        -- pseudo code --
-        for i in range(0, len(sequence), 2):
-            print(cells[i])
-            print(cells[1+1])
-
-        gets us:
-            larry
-            curly
-            ray
-            egon
-            foo
-            bar
-        ------------
-
-        Which would be the exact sequence of consideration for a lookup of WITHIN(LEFT=0, RIGHT=1)
-        from an observation existing in cell A4.
-
-        Note - we basically need to sequence the whole table bag here, so any cell that doesn't intersect with
-        a cell from out dimension selection is just a pointer to None (otherwise this will get computationally expensive).
         """
 
-        # Use the pointer on the 1st cell to get the pristine table the cell bag was formed from
+        # Get the cell bag into an iterable form
         pristine_table = []
         for pristine_cell in cell_bag.table.unordered_cells:
             pristine_table.append(pristine_cell)
@@ -202,72 +189,77 @@ class WithinEngine(object):
         self.table_height = max([cell.y for cell in pristine_table])
         self.table_width = max([cell.x for cell in pristine_table])
 
-        # TODO - it is CRITICAL to take a hard look at refactoring this for performance when its all working!
+        # TODO - we need to take a hard look at refactoring this for performance when its all working!
         # I doubt this is even remotely efficient (so lets get the tests working, then we're free to rip the following to bits and make it faster)
         sequence = []
 
-        oops = 'Aborting, WITHIN engine not correctly imbibing all table cells. Expected {} cells, Imbibing {}' # TODO, funny but ffs dont leave it as oops
-
         """
-        delete me
+        for my sanity, delete me later
         UP = (0, -1)
         RIGHT = (1, 0)
         DOWN = (0, 1)
         LEFT = (-1, 0)
         """
 
-        if self.direction == ABOVE:
+        # Scenario 1: Scanning leftwards by row moving upwards from the bottom right of the table
+        #if self.direction == ABOVE and self.direction_of_travel == LEFT:
+        #    for y_offset in range(self.table_height, -1, -1):           # work upwards from last row
+        #        for x_offset in range(self.table_width, -1, -1):        # work left from rightmost cell
 
-            # Scenario 1: Scanning leftwards moving upwards from the bottom right of the table/tab
-            if self.direction_of_travel == (-1, 0):
-                for y_offset in range(self.table_height, -1, -1):
-                    for x_offset in range(self.table_width, -1, -1):
-                        single_cell_bag = [cell for cell in pristine_table if cell.x == x_offset and cell.y == y_offset]
-                        sequence.append(single_cell_bag if single_cell_bag in cell_bag else None)
+        if self.direction == ABOVE and self.direction_of_travel == LEFT:
+            for (x_offset, y_offset) in self._xy_traveling_up_and_left():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1: 
+                    sequence.append(potential_cell[0])
 
-            # Scenario 2: Scanning rightwards moving upwards from the bottom left of the table/tab
-            elif self.direction_of_travel == (1, 0):
-                for y_offset in range(self.table_height, -1, -1):
-                    for x_offset in range(0, self.table_width+1, 1):
-                        potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                        if len(potential_cell) == 1:
-                            sequence.append(potential_cell[0])
+        # Scenario 2: Scanning rightwards by row moving upwards from the bottom left of the table
+        elif self.direction == ABOVE and self.direction_of_travel == RIGHT:
+            for (x_offset, y_offset) in self._xy_traveling_up_and_right():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    print(f'found {potential_cell[0]} at {x_offset} by {y_offset}')
+                    sequence.append(potential_cell[0])
 
-                        #possible_cell_as_list = [cell for cell in pristine_table if cell.x == x_offset and cell.y == y_offset]
-                        #possible_cell = possible_cell_as_list[0]
-                        ##assert len(possible_cell_as_list) == 1, f'Pristine table is {pristine_table}'
-                        #is_in_dimension = len([cell for cell in cell_bag if cell.x == possible_cell.x and cell.y == possible_cell.y]) > 0
-                        #sequence.append(possible_cell if is_in_dimension else NoneCell(x=x_offset, y=y_offset))
-            else:
-                raise ValueError(f'A direction of travel of {self.direction_of_travel} is incomptible with an ABOVE directed lookup')
+        # TODO - these
+        # Scenario 3: Scanning leftwards by row moving downwards from the top right of the table
+        # Scenario 4: Scanning rightwards by row moving downwards from the top left of the table
+        # Scenario 5: Scanning upwards by column moving leftwards from the bottom right of the table  
+        # Scenario 6: Scanning downwards by column moving rightwards from the top right of the table 
+        # Scenario 7: Scanning upwards by column moving rightwards from the bottom left of the table
+        # Scenario 8: Scanning upwards by column moving leftwards from the bottom right of the table
+
+        else:
+            raise ValueError(f'A direction of travel of {self.direction_of_travel} is incomptible with an {self.direction} directed lookup')
 
         return tuple(sequence) # render the sequence immutable because we're not massocists
-
 
     def lookup(self, cell):
         """
         Given a cell, lookup the first correct dimension header cell within the specified range of offsets.
-
-        Note: see the docstring for _sequencer for a explanation of how this works
         """
 
+        # TODO - think!
+        # We've got things into the right sequence so this will work, but given we know the absolute width and height of the
+        # table can we shortcut this? Feels like theres some logic hack to be found here to start us off a better informed /
+        # close to the mark point in the sequence.
+        
         found_cell = None
-
         for sequenced_cell in self.sequence:
-
-            if self.direction_of_travel == (1, 0):
-                if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset+1:
-                    found_cell = sequenced_cell
-                    break
-            else:
-                raise Exception(f'No handling for direction of travel {self.direction_of_travel}.')
-                
+            if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
+                found_cell = sequenced_cell
+                break
+   
         if found_cell is None:
-            raise ValueError(f'Unsuccessful withing lookup for cell {cell} in dimension {self.label}. Sequence is {self.sequence}')
+            raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
+                        f' and we were scanning {DIRECTION_DICT[self.direction_of_travel]} but no header cell was found in the specified range.')
+
+
+        # TODO, dev note. The below is happening in all 3 engines, wrap it in a helper function, DRY etc.
 
         # Apply str level cell value override if applicable
         if found_cell.value in self.cellvalueoverride:
             value = self.cellvalueoverride[found_cell.value]
+        # Apply cell level cell value override if applicable
         elif found_cell._cell in self.cellvalueoverride:
             value = self.cellvalueoverride[found_cell._cell]
         else:

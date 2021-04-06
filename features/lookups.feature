@@ -81,7 +81,8 @@ Scenario: Create a CONSTANT dimension
     Then all lookups to dimension "Constant1" should return the value "foo"
     And all lookups to dimension "Constant2" should return the value "bar"
 
-Scenario: Create a WITHIN ABOVE dimensionsional lookup
+# DEV NOTE - we'll need to add a test for every combination of direction & direction of travel
+Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
     Given we load an xls file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -90,7 +91,12 @@ Scenario: Create a WITHIN ABOVE dimensionsional lookup
         | observations      | tab.excel_ref("C6:I25")                 |
     And we define the dimensions as
         """
-        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(LEFT=1, RIGHT=1), ABOVE)
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(left=1, right=2), ABOVE)
         """
     Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
-    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<H3 'Dogs'>}"
+    And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+# DEV NOTE - we'll need a test that WITHIN is failing where it's supposed to fail.
+# So do we get the expected error with the expected output when we look say left->right in a range with 0 dimension selections in it?
