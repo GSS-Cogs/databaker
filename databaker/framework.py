@@ -4,7 +4,6 @@ import xypath.loader
 import databaker.constants
 from databaker.constants import *      # also brings in template
 import databaker.overrides as overrides       # warning: injects additional class functions into xypath and messytables
-from databaker.patch import add_docstrings
 
 # core classes and functionality
 from databaker.jupybakeutils import HDim, HDimConst, ConversionSegment, Ldatetimeunitloose, Ldatetimeunitforce, pdguessforceTIMEUNIT
@@ -30,7 +29,7 @@ def loadxlstabs(inputfile, sheetids="*", verbose=True):
     if len(set(tabnames)) != len(tabnames):
         warnings.warn("Duplicates found in table names list")
 
-    return add_docstrings(tabs)
+    return tabs
 
 DATABAKER_INPUT_FILE = None
 
