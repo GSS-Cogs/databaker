@@ -13,9 +13,4 @@ Feature: Load xlsx files
     """
     1. NUTS1, industry
     """
-
-    # "2018internationaltradeinservicesdatatables.xlsx"
-    # "bulletindataset2v2.xlsx"
-    # "exampleproperties.xlsx"
-    # "balanceofpayments2020q1.xlsx"
     

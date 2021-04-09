@@ -17,7 +17,6 @@ Feature: Define dimension using bag.is/is_not_richtext()
     Examples: File Types
             | File Name                   |
             | "bakingtestdataset.xls"     |
-            #| "bakingtestdataset.xlsx"    |
 
 Scenario Outline: Define construction type by richtext values in row "6"
     Given we load a file named <File Name>
@@ -34,4 +33,15 @@ Scenario Outline: Define construction type by richtext values in row "6"
     Examples: File Types
             | File Name                   |
             | "bakingtestdataset.xls"     |
-            #| "bakingtestdataset.xlsx"    |
+
+Scenario Outline: Define construction type by richtext values in row "6" in an .xlsx file
+    Given we load a file named <File Name>
+    And select the sheet "Sheet2"
+    And we define cell selections as
+      | key                           |value                                                         |  
+      | blank_construction_type       | tab.excel_ref("A6"+":P6").is_richtext().is_not_blank()       |
+    Then it throws an error of type "NotImplementedError"
+
+    Examples: File Types
+            | File Name                   |
+            | "bakingtestdataset.xlsx"    |

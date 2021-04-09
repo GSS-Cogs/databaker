@@ -70,7 +70,7 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
             | "exampleproperties.xlsx"    |
 
 
-    Scenario Outline: Select cells with any border from any file type.
+    Scenario Outline: Select cells with any border from a .xls file.
         Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
@@ -84,10 +84,21 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+
+    Scenario Outline: Select cells with any border from an .xlsx file.
+        Given we load a file named <File Name>
+        And select the sheet "Sheet1"
+        And we define cell selections as
+        | key                         | value                     |  
+        | any_border_selection        | tab.is_any_border()       |
+        Then it throws an error of type "NotImplementedError"
+
+        Examples: File Types
+            | File Name                   |
+            | "exampleproperties.xlsx"    |
 
 
-    Scenario Outline: Select cells with all borders from any file type.
+    Scenario Outline: Select cells with all borders from an .xls file.
         Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
@@ -101,7 +112,18 @@ Feature: Ensure that when a file is read, the correct cell properties are also s
         Examples: File Types
             | File Name                   |
             | "exampleproperties.xls"     |
-            #| "exampleproperties.xlsx"    |
+
+    Scenario Outline: Select cells with all borders from an .xlsx file.
+        Given we load a file named <File Name>
+        And select the sheet "Sheet1"
+        And we define cell selections as
+        | key                         | value                     |  
+        | any_border_selection        | tab.is_all_border()       |
+        Then it throws an error of type "NotImplementedError"
+
+        Examples: File Types
+            | File Name                   |
+            | "exampleproperties.xlsx"    |
 
     Scenario Outline: Select all non-blank cells
         Given we load a file named <File Name>

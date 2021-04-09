@@ -11,9 +11,6 @@ from messytables.compat23 import PY2
 
 import openpyxl
 
-class InvalidDateError(Exception):
-    pass
-
 # Note xls files only recognise type Float for numbers
 def get_data_type(openpyexcel_cell):
     """
@@ -137,29 +134,16 @@ class XLSXProperties(CoreProperties):
         return self.cell.openpyexcel_cell.font.size
 
     def get_any_border(self):
-        #b = self.cell.openpyexcel_cell.border
-        #b = self.cell.openpyexcel_cell.style
-        b = self.cell.properties
-        print(b)
-
-        #print(b.diagonalDown)
-        #print(b.diagonalUp)
-        #print(b.outline)
-
-        #if b.style is not None:
-        #    print(b.left or b.right or b.top or b.bottom )
-        return b.diagonalDown or b.diagonalUp or b.outline
-        #return b.left or b.right or b.top or b.bottom 
-        #raise NotImplementedError('Any Border property not implemented for xlsx files.')
+        raise NotImplementedError("""Raising error because openpyxl has no immediately 
+        obvious function for returning the cell border properties. Implementation
+        is functional for .xls files using xlrd""")
 
     def get_all_border(self):
-        b = self.cell.openpyexcel_cell.border
-        return b.left and b.right and b.top and b.bottom
-
-    #def rich(self):
-    #    return self.cell.
-        #return self.cell.sheet.rich_text_runlist_map.get(self.cell.xlrd_pos, None)
+        raise NotImplementedError("""Raising error because openpyxl has no immediately 
+        obvious function for returning the cell border properties. Implementation
+        is functional for .xls files using xlrd""")
 
     def get_richtext(self):
-        raise NotImplementedError
-        #return bool(self.rich)
+        raise NotImplementedError("""Raising error because openpyxl has no immediately 
+        obvious function for differentiating cells containing richtext. Implementation
+        is functional for .xls files using xlrd""")

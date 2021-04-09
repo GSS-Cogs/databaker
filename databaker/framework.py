@@ -25,7 +25,6 @@ def loadxlstabs(inputfile, sheetids="*", verbose=True):
     if verbose:
         print("Loading %s which has size %d bytes" % (inputfile, os.path.getsize(inputfile)))
     
-    # TODO - take string name, path or fileobject
     if type(inputfile) == PosixPath:
         inputfile = str(inputfile.absolute())
 
@@ -35,18 +34,13 @@ def loadxlstabs(inputfile, sheetids="*", verbose=True):
             tableset = XLSXTableSet(filename=inputfile)
         elif inputfile.endswith(".xls"):
             tableset = XLSTableSet(filename=inputfile)
-        elif inputfile.endswith(".ods"):
-            raise NotImplementedError('ODS table loader has not been implemented.')
-        elif inputfile.endswith(".csv"):
-            raise NotImplementedError('CSV table loader has not been implemented.')
     except Exception as err:
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')
         tableset = xypath.loader.table_set(inputfile, extension='xls')
     
-
-
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
+    assert len(tabs) > 0, f'Aborting. Unable to acquire any data tables'
     
     tabnames = [ tab.name  for tab in tabs ]
     if verbose:

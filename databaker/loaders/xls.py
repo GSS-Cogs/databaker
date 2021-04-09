@@ -13,8 +13,7 @@ from messytables.types import (StringType, IntegerType,
 from messytables.error import ReadError
 from messytables.compat23 import PY2
 
-class InvalidDateError(Exception):
-    pass
+from databaker.loaders.exceptions import *
 
 XLS_TYPES = {
     1: StringType(),
@@ -113,8 +112,7 @@ class XLSRowSet(RowSet):
                 try:
                     row.append(XLSCell.from_xlrdcell(cell, self.sheet, colnum, rownum))
                 except InvalidDateError:
-                    raise ValueError("Invalid date at '%s':%d,%d" % (
-                        self.sheet.name, colnum+1, rownum+1))
+                    raise ValueError(f"Invalid date at {self.sheet.name}:{colnum+1},{rownum+1}")
             yield row
 
 class XLSCell(Cell):
@@ -125,7 +123,7 @@ class XLSCell(Cell):
     
         if cell_type == DateType(None):
             if value == 0:
-                raise InvalidDateError
+                raise InvalidDateError(f'The date "{str(value)}" is not a valid date.')
             year, month, day, hour, minute, second = \
                 xlrd.xldate_as_tuple(value, sheet.book.datemode)
             if (year, month, day) == (0, 0, 0):

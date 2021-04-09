@@ -32,6 +32,18 @@ def cell_builder(cell_list):
             cell_set.add(cell)
     return(cell_set)
 
+#Tag we can give to step definitions (see: @given(u'we define cell selections as'))
+#Which will catch any exceptions which occur during the step execution.
+def catch_all(func):
+    def wrapper(context, *args, **kwargs):
+        try:
+            func(context, *args, **kwargs)
+            context.exc = None
+        except Exception as e:
+            context.exc = e
+
+    return wrapper
+
 @given('we load a file named "{xls_file}"')
 def step_impl(context, xls_file):
     path_to_xls = get_fixture(xls_file)
@@ -58,7 +70,9 @@ def step_impl(context):
     assert len(context.tabs) == len(tabs_wanted)
 
 #From the tab, define all dimensions and observations in the usual transform manner.
+#Catch any exceptions which occur during this process.
 @given(u'we define cell selections as')
+@catch_all
 def step_impl(context):
     tab = context.tab_selected
     context.selections = {}
@@ -142,30 +156,8 @@ def step_impl(context):
 
 @then(u'we confirm the cell selection is equal to')
 def step_impl(context):
-    #expected = str(context.text).strip()
-    #values = [v for v in context.selections.values()]
-    #actual = str(values[0])
-    #assert expected == actual, "{} \n\ndoes not match the expected output \n\n {}\n".format(str(actual), str(expected))
     expected = set()
-    #temp_actual = []
     actual = set()
-
-    #Function which builds a set made from a given string
-    #where each cell is the string between the two "<, >"
-    #def cell_builder(cell_list):
-    #    for char in range(0, len(str(cell_list))):
-    #        cell = ""
-    #        if str(cell_list)[char] == "<":
-    #            cell = cell + str(cell_list)[char]
-    #            current = char
-    #            next_char = str(cell_list)[current + 1]
-    #            while next_char != ">":
-    #                cell = cell + next_char
-    #                current += 1
-    #                next_char = str(cell_list)[current + 1]
-    #            cell = cell + ">"
-    #            expected.add(cell)
-    #    return(expected)
 
     #Build a set of cells from the expected output.
     expected = cell_builder(context.text)
@@ -191,3 +183,7 @@ def step_impl(context):
 @then(u'we confirm the cell selection contains no value storing cells.')
 def step_impl(context):
     assert "." not in str(cell_builder(str([str(v) for v in context.selections.values()][0]))), "{} \n\ncontains blank cells \n\n".format(str(cell_builder(str([str(v) for v in context.selections.values()][0]))))
+
+@then('it throws an error of type "{err_type}"')
+def step(context, err_type):
+    assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
