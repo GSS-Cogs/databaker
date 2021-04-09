@@ -39,6 +39,11 @@ class XLSXTableSet(TableSet):
         if not filename and not fileobj:
             raise Exception('You must provide one of filename or fileobj')
 
+        if fileobj:
+            read_obj = fileobj.read()
+        else:
+            read_obj = None
+            
         self.workbook = get_workbook()
 
     def make_tables(self):

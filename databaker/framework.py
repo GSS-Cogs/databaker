@@ -22,25 +22,30 @@ from databaker.jupybakecsv import headersfromwdasegment, extraheaderscheck, chec
 from databaker.jupybakecsv import wdamsgstrings, CompareConversionSegments
 
 def loadxlstabs(inputfile, sheetids="*", verbose=True):
-    if verbose:
-        print("Loading %s which has size %d bytes" % (inputfile, os.path.getsize(inputfile)))
     
-    if type(inputfile) == PosixPath:
-        inputfile = str(inputfile.absolute())
+    if verbose:
+        if type(inputfile) == PosixPath:
+            print(f'Loading {inputfile} which has size {os.path.getsize(inputfile)} bytes')
+        else:
+            print('Loading tables from file object')
 
+    def has_extension(inputfile, extension):
+        # Return bool: does the file (or the file obejects name) end with the file extension in question
+        input_file_extension = inputfile.split(".")[-1] if type(inputfile) == PosixPath else inputfile.name.split(".")[-1]
+        return extension == input_file_extension
+        
     # Fall back on messytables defaults if our local table loaders fail
     try:
-        if inputfile.endswith(".xlsx"):
-            tableset = XLSXTableSet(filename=inputfile)
-        elif inputfile.endswith(".xls"):
-            tableset = XLSTableSet(filename=inputfile)
+        if has_extension(inputfile, "xlsx"):
+            tableset = XLSXTableSet(filename=inputfile) if type(inputfile) == PosixPath else XLSXTableSet(fileobj=inputfile)
+        elif has_extension(inputfile, "xls"):
+            tableset = XLSTableSet(filename=inputfile) if type(inputfile) == PosixPath else XLSTableSet(fileobj=inputfile)
     except Exception as err:
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')
         tableset = xypath.loader.table_set(inputfile, extension='xls')
     
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
-    assert len(tabs) > 0, f'Aborting. Unable to acquire any data tables'
     
     tabnames = [ tab.name  for tab in tabs ]
     if verbose:
