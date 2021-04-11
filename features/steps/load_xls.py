@@ -44,11 +44,18 @@ def catch_all(func):
 
     return wrapper
 
-@given('we load a file named "{xls_file}"')
-def step_impl(context, xls_file):
-    path_to_xls = get_fixture(xls_file)
-    context.last_xls_loaded = path_to_xls
-    context.tabs = loadxlstabs(path_to_xls)
+@given('we load a file named "{sheet}"')
+def step_impl(context, sheet):
+    path_to_sheet = get_fixture(sheet)
+    context.last_xls_loaded = path_to_sheet
+    context.tabs = loadxlstabs(path_to_sheet)
+
+@given(u'we use a file object created from "{sheet}"')
+def step_impl(context, sheet):
+    path_to_sheet = get_fixture(sheet)
+    context.last_xls_loaded = path_to_sheet
+    with open(path_to_sheet, 'rb') as f:
+        context.tabs = loadxlstabs(f)
 
 @given('select the sheet "{sheet_wanted}"')
 def step_impl(context, sheet_wanted):

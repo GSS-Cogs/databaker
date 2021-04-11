@@ -21,29 +21,27 @@ from databaker.loaders.xls import XLSTableSet
 from databaker.jupybakecsv import headersfromwdasegment, extraheaderscheck, checktheconstantdimensions, checksegmentobsvalues
 from databaker.jupybakecsv import wdamsgstrings, CompareConversionSegments
 
-def loadxlstabs(inputfile, sheetids="*", verbose=True):
-    
-    if verbose:
-        if type(inputfile) == PosixPath:
-            print(f'Loading {inputfile} which has size {os.path.getsize(inputfile)} bytes')
-        else:
-            print('Loading tables from file object')
+def loadxlstabs(input, sheetids="*", verbose=True):
 
-    def has_extension(inputfile, extension):
-        # Return bool: does the file (or the file obejects name) end with the file extension in question
-        input_file_extension = inputfile.split(".")[-1] if type(inputfile) == PosixPath else inputfile.name.split(".")[-1]
-        return extension == input_file_extension
-        
-    # Fall back on messytables defaults if our local table loaders fail
+    is_file_object = not isinstance(input, str) and not isinstance(input, PosixPath)
+    input_file_name = input.name if is_file_object else input
+    input_file_obj = input if is_file_object else None
+
+    if verbose:
+        if is_file_object:
+            print(f'Loading fileobject {input_file_name} which has size {input_file_obj.__sizeof__()} bytes')
+        else:
+            print(f'Loading file {input_file_name} which has size {os.path.getsize(input_file_name)} bytes')
+
     try:
-        if has_extension(inputfile, "xlsx"):
-            tableset = XLSXTableSet(filename=inputfile) if type(inputfile) == PosixPath else XLSXTableSet(fileobj=inputfile)
-        elif has_extension(inputfile, "xls"):
-            tableset = XLSTableSet(filename=inputfile) if type(inputfile) == PosixPath else XLSTableSet(fileobj=inputfile)
+        if str(input_file_name).endswith(".xlsx"):
+            tableset = XLSXTableSet(filename=input_file_name, fileobj=input_file_obj)
+        elif str(input_file_name).endswith(".xls"):
+            tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
     except Exception as err:
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')
-        tableset = xypath.loader.table_set(inputfile, extension='xls')
+        tableset = xypath.loader.table_set(input, extension='xls')
     
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
     
