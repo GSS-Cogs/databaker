@@ -40,6 +40,7 @@ def loadxlstabs(input, sheetids="*", verbose=True):
         tableset = xypath.loader.table_set(input, extension='xls')
     
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
+    assert len(tabs) > 0, f'Aborting. Unable to acquire any data tables'
     
     tabnames = [ tab.name  for tab in tabs ]
     if verbose:
