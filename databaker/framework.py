@@ -1,6 +1,7 @@
 import logging
 import os, warnings
 from io import BytesIO
+import messytables
 import xypath
 import xypath.loader
 import databaker.constants
@@ -37,7 +38,7 @@ def loadxlstabs(input, sheetids="*", verbose=True):
     except Exception as err:
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')
-        tableset = xypath.loader.table_set(input, extension='xls')
+        tableset = messytables.excel.XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
     
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
     assert len(tabs) > 0, f'Aborting. Unable to acquire any data tables'
