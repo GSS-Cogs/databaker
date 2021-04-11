@@ -17,10 +17,6 @@ from databaker.jupybakehtml import savepreviewhtml
 from databaker.loaders.xlsx import XLSXTableSet
 from databaker.loaders.xls import XLSTableSet
 
-# this lot should be deprecated
-from databaker.jupybakecsv import headersfromwdasegment, extraheaderscheck, checktheconstantdimensions, checksegmentobsvalues
-from databaker.jupybakecsv import wdamsgstrings, CompareConversionSegments
-
 def loadxlstabs(input, sheetids="*", verbose=True):
 
     is_file_object = not isinstance(input, str) and not isinstance(input, PosixPath)

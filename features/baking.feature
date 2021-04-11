@@ -31,6 +31,7 @@ Feature: Produce a pandas dataframe containing all data values in the format of 
         HDim(county, "County", DIRECTLY, RIGHT)
         HDim(country, "Country", CLOSEST, ABOVE)
         HDim(unit, "Unit", CLOSEST, RIGHT)
+        HDimConst("Constant", "Thing")
         """
         And we create a ConversionSegment object.
         And we convert the ConversionSegment object into a pandas dataframe.
@@ -70,6 +71,7 @@ Feature: Produce a pandas dataframe containing all data values in the format of 
         HDim(county, "County", DIRECTLY, RIGHT)
         HDim(country, "Country", CLOSEST, ABOVE)
         HDim(unit, "Unit", CLOSEST, RIGHT)
+        HDimConst("Constant", "Thing")
         """
         And we create a ConversionSegment object.
         And we convert the ConversionSegment object into a pandas dataframe.
