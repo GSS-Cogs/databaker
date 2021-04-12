@@ -1,5 +1,5 @@
 nose==1.3.7
 docopt==0.6.2
-git+https://github.com/GSS-Cogs/xypath.git@1c440d51c5f1fdeeadb290bfc3aeaadf6f24d029#egg=xypath
+xypath==1.1.0
 xlutils==2.0.0
 pyhamcrest==1.9.0
