@@ -2,7 +2,7 @@ Feature: Create lookup engines
   I want databaker to store accurate lookup information for a given dimension, given the direction and type of lookup.
 
     Scenario: Create a DIRECTLY dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                                   |  
@@ -35,7 +35,7 @@ Feature: Create lookup engines
         """ 
 
     Scenario: Create a CLOSEST dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                                   |  
@@ -68,7 +68,7 @@ Feature: Create lookup engines
         """
 
 Scenario: Create a CONSTANT dimension
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
         And select the sheet "Sheet1"
         And we define cell selections as
         | key             | value                                   | 

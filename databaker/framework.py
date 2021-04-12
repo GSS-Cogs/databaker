@@ -1,20 +1,48 @@
+import logging
 import os, warnings
+from io import BytesIO
+import messytables
 import xypath
 import xypath.loader
 import databaker.constants
 from databaker.constants import *      # also brings in template
 import databaker.overrides as overrides       # warning: injects additional class functions into xypath and messytables
 
+from pathlib import PosixPath
+
 # core classes and functionality
 from databaker.jupybakeutils import HDim, HDimConst, ConversionSegment, Ldatetimeunitloose, Ldatetimeunitforce, pdguessforceTIMEUNIT
 from databaker.jupybakecsv import writetechnicalCSV, readtechnicalCSV
 from databaker.jupybakehtml import savepreviewhtml
 
-def loadxlstabs(inputfile, sheetids="*", verbose=True):
+from databaker.loaders.xlsx import XLSXTableSet
+from databaker.loaders.xls import XLSTableSet
+
+def loadxlstabs(input, sheetids="*", verbose=True):
+
+    is_file_object = not isinstance(input, str) and not isinstance(input, PosixPath)
+    input_file_name = input.name if is_file_object else input
+    input_file_obj = input if is_file_object else None
+
     if verbose:
-        print("Loading %s which has size %d bytes" % (inputfile, os.path.getsize(inputfile)))
-    tableset = xypath.loader.table_set(inputfile, extension='xls')
+        if is_file_object:
+            print(f'Loading fileobject {input_file_name} which has size {input_file_obj.__sizeof__()} bytes')
+        else:
+            print(f'Loading file {input_file_name} which has size {os.path.getsize(input_file_name)} bytes')
+
+    try:
+        if str(input_file_name).endswith(".xlsx"):
+            tableset = XLSXTableSet(filename=input_file_name, fileobj=input_file_obj)
+        elif str(input_file_name).endswith(".xls"):
+            tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
+    except Exception as err:
+        logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
+                        'Falling through to default messytables table loader.')
+        tableset = messytables.excel.XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
+    
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
+    assert len(tabs) > 0, f'Aborting. Unable to acquire any data tables'
+    
     tabnames = [ tab.name  for tab in tabs ]
     if verbose:
         print("Table names: %s" % str(tabnames))
