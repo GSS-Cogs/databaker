@@ -82,6 +82,25 @@ Scenario: Create a CONSTANT dimension
     And all lookups to dimension "Constant2" should return the value "bar"
 
 # DEV NOTE - we'll need to add a test for every combination of direction & direction of travel
+
+#Scenario 1
+Scenario: Create a WITHIN ABOVE, right to left dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), ABOVE)
+        """
+    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 2
 Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
     Given we load an xls file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
@@ -97,6 +116,127 @@ Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
     And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
     And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
     And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 3
+#Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
+#    Given we load an xls file named "bakingtestdataset.xls"
+#    And select the sheet "Sheet1"
+#    And we define cell selections as
+#        | key               | value                                   |  
+#        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()       |
+#        | observations      | tab.excel_ref("C6:I25")                 |
+#    And we define the dimensions as
+#        """
+#        HDim(sheep_and_ducks, "Sheep and Ducks", WITHIN(right=2, left=1), BELOW)
+#        """
+#    Then the lookup from an observation in cell "C6" to the dimension "Sheep and Ducks" returns "{<E28 'Sheep'>}"
+#    And the lookup from an observation in cell "F6" to the dimension "Sheep and Ducks" returns "{<E28 'Sheep'>}"
+#    And the lookup from an observation in cell "G6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
+#    And the lookup from an observation in cell "I6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
+
+#Scenario 3
+Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), BELOW)
+        """
+    Then the lookup from an observation in cell "C6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 4
+Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(left=1, right=2), BELOW)
+        """
+    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 5
+Scenario: Create a WITHIN ABOVE, right to left columns dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), ABOVE)
+        """
+    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 6
+Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(left=1, right=2), BELOW)
+        """
+    Then the lookup from an observation in cell "C6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 7
+Scenario: Create a WITHIN ABOVE, left to right columns dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(left=1, right=2), ABOVE)
+        """
+    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+#Scenario 8
+Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), BELOW)
+        """
+    Then the lookup from an observation in cell "C6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "F6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
+    And the lookup from an observation in cell "G6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+    And the lookup from an observation in cell "I6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+
+
 
 # DEV NOTE - we'll need a test that WITHIN is failing where it's supposed to fail.
 # So do we get the expected error with the expected output when we look say left->right in a range with 0 dimension selections in it?

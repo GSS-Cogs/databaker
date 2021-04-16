@@ -58,8 +58,8 @@ class WITHIN(object):
                     self.direction_of_travel = RIGHT
                     break
                 if k == "right":
-                    self.starting_offset = kwargs["right"]
-                    self.ending_offset = kwargs["left"]
+                    self.starting_offset = kwargs["left"]
+                    self.ending_offset = kwargs["right"]
                     self.direction_of_travel = LEFT
                     break
         elif above is not None:
@@ -70,8 +70,8 @@ class WITHIN(object):
                     self.direction_of_travel = DOWN
                     break
                 if k == "below":
-                    self.starting_offset = kwargs["below"]
-                    self.ending_offset = kwargs["above"]
+                    self.starting_offset = kwargs["above"]
+                    self.ending_offset = kwargs["below"]
                     self.direction_of_travel = UP
                     break
         else:
@@ -138,16 +138,7 @@ class WithinEngine(object):
         self.sequence = self._sequencer(cell_bag)  # see docstring
 
     # test me!
-    def _xy_traveling_up_and_right(self):
-        """
-        Helper, given we know the length and height of the table, yield tuples of all
-        xy co-ordinates travelling left to right from the bottom row to the top row
-        """
-        for y_offset in range(self.table_height, -1, -1):
-            for x_offset in range(0, self.table_width+1, 1):
-                yield x_offset, y_offset
-
-    # test me!
+    # scenario 1
     def _xy_traveling_up_and_left(self):
         """
         Helper, given we know the length and height of the table, yield tuples of all
@@ -155,6 +146,81 @@ class WithinEngine(object):
         """
         for y_offset in range(self.table_height, -1, -1):
             for x_offset in range(self.table_width, -1, -1):
+                yield x_offset, y_offset
+
+    # test me!
+    # Scenario 2
+    def _xy_traveling_up_and_right(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling left to right from the bottom row to the top row
+        """
+        for y_offset in range(self.table_height, -1, -1):
+            for x_offset in range(-1, self.table_width, 1):
+                yield x_offset, y_offset
+
+    # scenario 3
+    def _xy_traveling_down_and_left(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling right to left from the top row to the bottom row
+        """
+        for y_offset in range(-1, self.table_height, 1):
+            for x_offset in range(self.table_width, -1, -1):
+                yield x_offset, y_offset
+
+    # scenario 4
+    def _xy_traveling_down_and_right(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling left to right from the top row to the bottom row
+        """
+        for y_offset in range(-1, self.table_height, 1):
+            for x_offset in range(-1, self.table_width, 1):
+                yield x_offset, y_offset
+
+    # scenario 5
+    def _xy_traveling_up_cols_and_left(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling from the right most column left and from the bottom 
+        row upwards
+        """
+        for x_offset in range(self.table_width, -1, -1):
+            for y_offset in range(self.table_height, -1, -1):
+                yield x_offset, y_offset
+
+    # scenario 6
+    def _xy_traveling_down_cols_and_right(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling from the left most column right and from the top 
+        row downwards
+        """
+        for x_offset in range(-1, self.table_width, 1):
+            for y_offset in range(-1, self.table_height, 1):
+                yield x_offset, y_offset
+
+    # scenario 7
+    def _xy_traveling_up_cols_and_right(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling from the left most column right and from the bottom 
+        row upwards
+        """
+        for x_offset in range(-1, self.table_width, 1):
+            for y_offset in range(self.table_height, -1, -1):
+                yield x_offset, y_offset
+
+    # scenario 8
+    def _xy_traveling_down_cols_and_left(self):
+        """
+        Helper, given we know the length and height of the table, yield tuples of all
+        xy co-ordinates travelling from the right most column left and from the top 
+        row downwards
+        """
+        for x_offset in range(self.table_width, -1, -1):
+            for y_offset in range(-1, self.table_height, 1):
                 yield x_offset, y_offset
 
     def _sequencer(self, cell_bag):
@@ -200,20 +266,54 @@ class WithinEngine(object):
             for (x_offset, y_offset) in self._xy_traveling_up_and_right():
                 potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
                 if len(potential_cell) == 1:
-                    print(f'found {potential_cell[0]} at {x_offset} by {y_offset}')
                     sequence.append(potential_cell[0])
 
         # TODO - these
         # Scenario 3: Scanning leftwards by row moving downwards from the top right of the table
-        # Scenario 4: Scanning rightwards by row moving downwards from the top left of the table
-        # Scenario 5: Scanning upwards by column moving leftwards from the bottom right of the table  
-        # Scenario 6: Scanning downwards by column moving rightwards from the top right of the table 
-        # Scenario 7: Scanning upwards by column moving rightwards from the bottom left of the table
-        # Scenario 8: Scanning upwards by column moving leftwards from the bottom right of the table
+        elif self.direction == BELOW and self.direction_of_travel == LEFT:
+            for (x_offset, y_offset) in self._xy_traveling_down_and_left():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    sequence.append(potential_cell[0])
 
+        # Scenario 4: Scanning rightwards by row moving downwards from the top left of the table
+        elif self.direction == BELOW and self.direction_of_travel == RIGHT:
+            for (x_offset, y_offset) in self._xy_traveling_down_and_right():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    sequence.append(potential_cell[0])
+
+        # Scenario 5: Scanning upwards by column moving leftwards from the bottom right of the table
+        elif self.direction == ABOVE and self.direction_of_travel == LEFT:
+            for (x_offset, y_offset) in self._xy_traveling_up_cols_and_left():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    sequence.append(potential_cell[0])
+
+        # Scenario 6: Scanning downwards by column moving rightwards from the top right of the table
+        elif self.direction == BELOW and self.direction_of_travel == BELOW:
+            for (x_offset, y_offset) in self._xy_traveling_down_cols_and_right():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    sequence.append(potential_cell[0])
+
+        # Scenario 7: Scanning upwards by column moving rightwards from the bottom left of the table
+        elif self.direction == ABOVE and self.direction_of_travel == RIGHT:
+            for (x_offset, y_offset) in self._xy_traveling_up_cols_and_right():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    sequence.append(potential_cell[0])
+
+        # Scenario 8: Scanning downwards by column moving leftwards from the top left of the table
+        elif self.direction == BELOW and self.direction_of_travel == LEFT:
+            for (x_offset, y_offset) in self._xy_traveling_down_cols_and_left():
+                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
+                if len(potential_cell) == 1:
+                    sequence.append(potential_cell[0])
+        
         else:
             raise ValueError(f'A direction of travel of {self.direction_of_travel} is incomptible with an {self.direction} directed lookup')
-
+        
         return tuple(sequence) # render the sequence immutable because we're not massocists
 
     def lookup(self, cell):
@@ -231,7 +331,7 @@ class WithinEngine(object):
             if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
                 found_cell = sequenced_cell
                 break
-   
+
         if found_cell is None:
             raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
                         f' and we were scanning {DIRECTION_DICT[self.direction_of_travel]} but no header cell was found in the specified range.')
