@@ -344,7 +344,7 @@ class WithinEngine(object):
                 print(self.starting_offset)
                 print(self.ending_offset)
                 print()
-                if sequenced_cell.x <= cell.x-self.starting_offset and sequenced_cell.x >= cell.x+self.ending_offset:
+                if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
                     found_cell = sequenced_cell
                     break
             

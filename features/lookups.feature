@@ -144,12 +144,13 @@ Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
 #        | observations      | tab.excel_ref("C6:I25")                 |
 #    And we define the dimensions as
 #        """
+#        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), BELOW)
 #        """
 #    Then the lookup from an observation in cell "C6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
-###        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), BELOW)
+#
 #    And the lookup from an observation in cell "F6" to the dimension "Cats And Dogs" returns "{<E3 'Cats'>}"
 #    And the lookup from an observation in cell "I6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
-##    And the lookup from an observation in cell "G6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
+#    And the lookup from an observation in cell "G6" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
 
 #Scenario 4
 Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
