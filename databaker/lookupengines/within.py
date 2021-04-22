@@ -177,7 +177,7 @@ class WithinEngine(object):
         xy co-ordinates travelling left to right from the top row to the bottom row
         """
         for y_offset in range(0, self.table_height+1, 1):
-            for x_offset in range(-1, self.table_width, 1):
+            for x_offset in range(0, self.table_width+1, 1):
                 yield x_offset, y_offset
 
     # scenario 5
@@ -198,8 +198,8 @@ class WithinEngine(object):
         xy co-ordinates travelling from the left most column right and from the top 
         row downwards
         """
-        for x_offset in range(-1, self.table_width, 1):
-            for y_offset in range(-1, self.table_height, 1):
+        for x_offset in range(0, self.table_width+1, 1):
+            for y_offset in range(0, self.table_height+1, 1):
                 yield x_offset, y_offset
 
     # scenario 7
@@ -209,7 +209,7 @@ class WithinEngine(object):
         xy co-ordinates travelling from the left most column right and from the bottom 
         row upwards
         """
-        for x_offset in range(-1, self.table_width, 1):
+        for x_offset in range(0, self.table_width+1, 1):
             for y_offset in range(self.table_height, -1, -1):
                 yield x_offset, y_offset
 
@@ -295,7 +295,7 @@ class WithinEngine(object):
                     sequence.append(potential_cell[0])
 
         # Scenario 6: Scanning downwards by column moving rightwards from the top right of the table
-        elif self.direction == BELOW and self.direction_of_travel == BELOW:
+        elif self.direction == BELOW and self.direction_of_travel == RIGHT:
             for (x_offset, y_offset) in self._xy_traveling_down_cols_and_right():
                 potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
                 if len(potential_cell) == 1:
@@ -328,35 +328,34 @@ class WithinEngine(object):
         # TODO - think!
         # We've got things into the right sequence so this will work, but given we know the absolute width and height of the
         # table can we shortcut this? Feels like there might be some logic hack to be found here to start us off a better informed /
-        # close to the mark point in the sequence.
-        
+        # close to the mark point in the sequence.  
         found_cell = None
         print(self.sequence)
         for sequenced_cell in self.sequence:
             if self.direction == ABOVE:
                 if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
+                    if sequenced_cell.y < cell.y: # We're looking above, the dimenion option needs to above the cell
+                        found_cell = sequenced_cell
                     found_cell = sequenced_cell
                     break
 
             elif self.direction == BELOW:
-                print(sequenced_cell.x)
-                print(cell.x)
-                print(self.starting_offset)
-                print(self.ending_offset)
-                print()
                 if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
-                    found_cell = sequenced_cell
-                    break
-            
+                    if sequenced_cell.y > cell.y: # We're looking below, the dimenion option needs to below the cell
+                        found_cell = sequenced_cell
+                        break
+
             elif self.direction == LEFT:
                 if sequenced_cell.y >= cell.y-self.starting_offset and sequenced_cell.y <= cell.y+self.ending_offset:
-                    found_cell = sequenced_cell
-                    break
-
+                    if sequenced_cell.x < cell.x: # We're looking left, the dimenion option needs to left of the cell
+                        found_cell = sequenced_cell
+                        break
+                    
             elif self.direction == RIGHT:
                 if sequenced_cell.y <= cell.y-self.starting_offset and sequenced_cell.y >= cell.x+self.ending_offset:
-                    found_cell = sequenced_cell
-                    break
+                    if sequenced_cell.x > cell.x: # We're looking right, the dimenion option needs to be right of cell
+                        found_cell = sequenced_cell
+                        break
 
         if found_cell is None:
             raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
