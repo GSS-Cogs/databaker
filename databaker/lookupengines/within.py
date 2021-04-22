@@ -1,5 +1,6 @@
 
 from databaker.constants import ABOVE, BELOW, UP, DOWN, LEFT, RIGHT, DIRECTION_DICT
+#from databaker.lookupengines import cell_val_override
 
 # Essentially a factory function for the actual WithinEngine
 # I don't particularly like breaking the python convention of UPPERCLASS == a constant
@@ -156,7 +157,7 @@ class WithinEngine(object):
         xy co-ordinates travelling left to right from the bottom row to the top row
         """
         for y_offset in range(self.table_height, -1, -1):
-            for x_offset in range(-1, self.table_width, 1):
+            for x_offset in range(0, self.table_width+1, 1):
                 yield x_offset, y_offset
 
     # scenario 3
@@ -165,7 +166,7 @@ class WithinEngine(object):
         Helper, given we know the length and height of the table, yield tuples of all
         xy co-ordinates travelling right to left from the top row to the bottom row
         """
-        for y_offset in range(-1, self.table_height, 1):
+        for y_offset in range(0, self.table_height+1, 1):
             for x_offset in range(self.table_width, -1, -1):
                 yield x_offset, y_offset
 
@@ -175,7 +176,7 @@ class WithinEngine(object):
         Helper, given we know the length and height of the table, yield tuples of all
         xy co-ordinates travelling left to right from the top row to the bottom row
         """
-        for y_offset in range(-1, self.table_height, 1):
+        for y_offset in range(0, self.table_height+1, 1):
             for x_offset in range(-1, self.table_width, 1):
                 yield x_offset, y_offset
 
@@ -272,9 +273,12 @@ class WithinEngine(object):
         # Scenario 3: Scanning leftwards by row moving downwards from the top right of the table
         elif self.direction == BELOW and self.direction_of_travel == LEFT:
             for (x_offset, y_offset) in self._xy_traveling_down_and_left():
+                #print(x_offset)
+                #print(y_offset)
                 potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
                 if len(potential_cell) == 1:
                     sequence.append(potential_cell[0])
+
 
         # Scenario 4: Scanning rightwards by row moving downwards from the top left of the table
         elif self.direction == BELOW and self.direction_of_travel == RIGHT:
@@ -327,10 +331,32 @@ class WithinEngine(object):
         # close to the mark point in the sequence.
         
         found_cell = None
+        print(self.sequence)
         for sequenced_cell in self.sequence:
-            if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
-                found_cell = sequenced_cell
-                break
+            if self.direction == ABOVE:
+                if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
+                    found_cell = sequenced_cell
+                    break
+
+            elif self.direction == BELOW:
+                print(sequenced_cell.x)
+                print(cell.x)
+                print(self.starting_offset)
+                print(self.ending_offset)
+                print()
+                if sequenced_cell.x <= cell.x-self.starting_offset and sequenced_cell.x >= cell.x+self.ending_offset:
+                    found_cell = sequenced_cell
+                    break
+            
+            elif self.direction == LEFT:
+                if sequenced_cell.y >= cell.y-self.starting_offset and sequenced_cell.y <= cell.y+self.ending_offset:
+                    found_cell = sequenced_cell
+                    break
+
+            elif self.direction == RIGHT:
+                if sequenced_cell.y <= cell.y-self.starting_offset and sequenced_cell.y >= cell.x+self.ending_offset:
+                    found_cell = sequenced_cell
+                    break
 
         if found_cell is None:
             raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
@@ -339,6 +365,11 @@ class WithinEngine(object):
 
         # TODO, dev note. The below is happening in all engines other than constant, wrap it in a helper function, DRY etc.
 
+        #x = found_cell.value
+        #y = self.cellvalueoverride
+        #z = found_cell._cell
+        
+        #cell_val_override(x, y, z)
         # Apply str level cell value override if applicable
         if found_cell.value in self.cellvalueoverride:
             value = self.cellvalueoverride[found_cell.value]
