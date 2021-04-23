@@ -1,6 +1,7 @@
 import json
 
 from databaker.constants import ABOVE, BELOW, LEFT, RIGHT, DIRECTION_DICT
+from databaker.lookupengines.cell_val_override import cell_val_override
 
 class BoundaryError(Exception):
     """ Raised when attempting to lookup outside the bounds of where a lookup can exist"""
@@ -235,12 +236,13 @@ Break points": {ordered_break_point_list}
             self.index = None
 
             # Apply str level cell value override if applicable
-            if r["dimension_cell"].value in self.cellvalueoverride:
-                value = self.cellvalueoverride[r["dimension_cell"].value]
+            #if r["dimension_cell"].value in self.cellvalueoverride:
+            #    value = self.cellvalueoverride[r["dimension_cell"].value]
             # Apply cell level cell value override if applicable
-            elif r["dimension_cell"]._cell in self.cellvalueoverride:
-                value = self.cellvalueoverride[r["dimension_cell"]._cell]
-            else:
-                value = r["dimension_cell"].value
+            #elif r["dimension_cell"]._cell in self.cellvalueoverride:
+            #    value = self.cellvalueoverride[r["dimension_cell"]._cell]
+            #else:
+            #    value = r["dimension_cell"].value
 
-            return r["dimension_cell"], value
+            #return r["dimension_cell"], value
+            return cell_val_override(r["dimension_cell"], value)

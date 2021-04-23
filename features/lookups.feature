@@ -81,8 +81,6 @@ Scenario: Create a CONSTANT dimension
     Then all lookups to dimension "Constant1" should return the value "foo"
     And all lookups to dimension "Constant2" should return the value "bar"
 
-# DEV NOTE - we'll need to add a test for every combination of direction & direction of travel
-
 #Scenario 1
 Scenario: Create a WITHIN ABOVE, right to left dimensionsional lookup
     Given we load an xls file named "bakingtestdataset.xls"
@@ -123,7 +121,7 @@ Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
-        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()       |
+        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()      |
         | observations      | tab.excel_ref("C6:I25")                 |
     And we define the dimensions as
         """
@@ -140,7 +138,7 @@ Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
-        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()       |
+        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()      |
         | observations      | tab.excel_ref("C6:I25")                 |
     And we define the dimensions as
         """
@@ -174,7 +172,7 @@ Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
-        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()       |
+        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()      |
         | observations      | tab.excel_ref("C6:I25")                 |
     And we define the dimensions as
         """
@@ -208,7 +206,7 @@ Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
-        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()       |
+        | sheep_and_ducks   | tab.excel_ref("28").is_not_blank()      |
         | observations      | tab.excel_ref("C6:I25")                 |
     And we define the dimensions as
         """
@@ -219,7 +217,16 @@ Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
     And the lookup from an observation in cell "G6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
     And the lookup from an observation in cell "I6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
 
-
-
-# DEV NOTE - we'll need a test that WITHIN is failing where it's supposed to fail.
-# So do we get the expected error with the expected output when we look say left->right in a range with 0 dimension selections in it?
+Scenario: Create a WITHIN dimensional lookup with 0 dimension selections
+    Given we load an xls file named "bakingtestdataset.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                   |  
+        | sheep_and_ducks   | tab.excel_ref("29").is_not_blank()      |
+        | observations      | tab.excel_ref("C6:I25")                 |
+    And we define the dimensions as
+        """
+        HDim(sheep_and_ducks, "Sheep and Ducks", WITHIN(right=2, left=1), BELOW)
+        """
+    Then the lookup from an observation in cell "C6" to the dimension "Sheep and Ducks" returns "{<E28 'Sheep'>}"
+    And it throws an error of type "ValueError"

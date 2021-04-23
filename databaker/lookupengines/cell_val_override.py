@@ -1,11 +1,11 @@
-def cell_val_override(x, y, z):
-    # Apply str level cell value override if applicable
-    if x in y:
-        value = y[x]
+def cell_val_override(found_cell, cellvalueoverride):
+#    # Apply str level cell value override if applicable
+    if found_cell.value in cellvalueoverride:
+        value = cellvalueoverride[found_cell.value]
     # Apply cell level cell value override if applicable
-    elif z in y:
-        value = y[z]
+    elif found_cell._cell in cellvalueoverride:
+        value = cellvalueoverride[found_cell._cell]
     else:
-        value = x
+        value = found_cell.value
 
     return found_cell, value

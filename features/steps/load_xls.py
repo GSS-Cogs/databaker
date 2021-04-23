@@ -33,6 +33,16 @@ def cell_builder(cell_list):
             cell_set.add(cell)
     return(cell_set)
 
+def catch_all(func):
+    def wrapper(context, *args, **kwargs):
+        try:
+            func(context, *args, **kwargs)
+            context.exc = None
+        except Exception as e:
+            context.exc = e
+
+    return wrapper
+
 @given('we load an xls file named "{xls_file}"')
 def step_impl(context, xls_file):
     path_to_xls = get_fixture(xls_file)
@@ -275,6 +285,7 @@ Expected:
         assert got_err_str == expected_err_str, msg
 
 @then('the lookup from an observation in cell "{ob_cell_excel_ref}" to the dimension "{dimension_name}" returns "{expecting}"')
+@catch_all
 def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
     dimension = [x for x in context.dimensions if x.name == dimension_name]
     assert len(dimension) == 1, f'Could not find a dimension named {dimension_name}'
@@ -293,3 +304,7 @@ def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
 
     looked_up_cell, _ = dimension.celllookup(ob_cell)
     assert str(looked_up_cell) == expecting, f'Got {str(looked_up_cell)}, expected {expecting}'
+
+@then('it throws an error of type "{err_type}"')
+def step(context, err_type):
+    assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
