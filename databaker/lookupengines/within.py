@@ -1,6 +1,6 @@
 
 from databaker.constants import ABOVE, BELOW, UP, DOWN, LEFT, RIGHT, DIRECTION_DICT
-from databaker.lookupengines.cell_val_override import cell_val_override
+from databaker.lookupengines.generic import override_looked_up_cell
 
 # Essentially a factory function for the actual WithinEngine
 # I don't particularly like breaking the python convention of UPPERCLASS == a constant
@@ -53,26 +53,22 @@ class WITHIN(object):
         if left is not None:
             # Consider the kwargs in the order they were recieved
             for k, v in kwargs.items():
+                self.starting_offset = kwargs["left"]
+                self.ending_offset = kwargs["right"]
                 if k == "left":
-                    self.starting_offset = kwargs["left"]
-                    self.ending_offset = kwargs["right"]
                     self.direction_of_travel = RIGHT
                     break
                 if k == "right":
-                    self.starting_offset = kwargs["left"]
-                    self.ending_offset = kwargs["right"]
                     self.direction_of_travel = LEFT
                     break
         elif above is not None:
+            self.starting_offset = kwargs["above"]
+            self.ending_offset = kwargs["below"]
             for k, v in kwargs.items():
                 if k == "above":
-                    self.starting_offset = kwargs["above"]
-                    self.ending_offset = kwargs["below"]
                     self.direction_of_travel = DOWN
                     break
                 if k == "below":
-                    self.starting_offset = kwargs["above"]
-                    self.ending_offset = kwargs["below"]
                     self.direction_of_travel = UP
                     break
         else:
@@ -254,66 +250,49 @@ class WithinEngine(object):
 
         # TODO - we need to take a hard look at refactoring this for performance when its all working!
         # I doubt this is even remotely efficient (so lets get the tests working, then we're free to rip the following to bits and make it faster)
-        sequence = []
+        
 
-        if self.direction == ABOVE and self.direction_of_travel == LEFT:
-            for (x_offset, y_offset) in self._xy_traveling_up_and_left():
+        def build_sequence(sequence_generator_method):
+            sequence = []
+            for (x_offset, y_offset) in sequence_generator_method:
                 potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
                 if len(potential_cell) == 1: 
                     sequence.append(potential_cell[0])
 
-        # Scenario 2: Scanning rightwards by row moving upwards from the bottom left of the table
-        elif self.direction == ABOVE and self.direction_of_travel == RIGHT:
-            for (x_offset, y_offset) in self._xy_traveling_up_and_right():
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
-
-        # TODO - these
-        # Scenario 3: Scanning leftwards by row moving downwards from the top right of the table
-        elif self.direction == BELOW and self.direction_of_travel == LEFT:
-            for (x_offset, y_offset) in self._xy_traveling_down_and_left():
-                #print(x_offset)
-                #print(y_offset)
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
-
-        # Scenario 4: Scanning rightwards by row moving downwards from the top left of the table
-        elif self.direction == BELOW and self.direction_of_travel == RIGHT:
-            for (x_offset, y_offset) in self._xy_traveling_down_and_right():
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
-
-        # Scenario 5: Scanning upwards by column moving leftwards from the bottom right of the table
-        elif self.direction == ABOVE and self.direction_of_travel == LEFT:
-            for (x_offset, y_offset) in self._xy_traveling_up_cols_and_left():
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
-
-        # Scenario 6: Scanning downwards by column moving rightwards from the top right of the table
-        elif self.direction == BELOW and self.direction_of_travel == RIGHT:
-            for (x_offset, y_offset) in self._xy_traveling_down_cols_and_right():
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
-
-        # Scenario 7: Scanning upwards by column moving rightwards from the bottom left of the table
-        elif self.direction == ABOVE and self.direction_of_travel == RIGHT:
-            for (x_offset, y_offset) in self._xy_traveling_up_cols_and_right():
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
-
-        # Scenario 8: Scanning downwards by column moving leftwards from the top left of the table
-        elif self.direction == BELOW and self.direction_of_travel == LEFT:
-            for (x_offset, y_offset) in self._xy_traveling_down_cols_and_left():
-                potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
-                if len(potential_cell) == 1:
-                    sequence.append(potential_cell[0])
+            return sequence
         
+        #Scenario 1
+        if self.direction == ABOVE and self.direction_of_travel == LEFT:
+            sequence = build_sequence(self._xy_traveling_up_and_left())
+
+        #Scenario 2
+        elif self.direction == ABOVE and self.direction_of_travel == RIGHT:
+            sequence = build_sequence(self._xy_traveling_up_and_right())
+
+        #Scenario 3
+        elif self.direction == BELOW and self.direction_of_travel == LEFT:
+            sequence = build_sequence(self._xy_traveling_down_and_left())
+
+        #Scenario 4
+        elif self.direction == BELOW and self.direction_of_travel == RIGHT:
+            sequence = build_sequence(self._xy_traveling_down_and_right())
+
+        #Scenario 5
+        elif self.direction == LEFT and self.direction_of_travel == UP:
+            sequence = build_sequence(self._xy_traveling_up_cols_and_left())
+
+        #Scenario 6
+        elif self.direction == RIGHT and self.direction_of_travel == DOWN:
+            sequence = build_sequence(self._xy_traveling_up_cols_and_right())
+
+        #Scenario 7
+        elif self.direction == RIGHT and self.direction_of_travel == UP:
+            sequence = build_sequence(self._xy_traveling_up_cols_and_right())
+
+        #Scenario 8
+        elif self.direction == LEFT and self.direction_of_travel == DOWN:
+            sequence = build_sequence(self._xy_traveling_down_cols_and_left())
+
         else:
             raise ValueError(f'A direction of travel of {self.direction_of_travel} is incomptible with an {self.direction} directed lookup')
         
@@ -359,4 +338,5 @@ class WithinEngine(object):
             raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
                         f' and we were scanning {DIRECTION_DICT[self.direction_of_travel]} but no header cell was found in the specified range.')
 
-        return cell_val_override(found_cell, self.cellvalueoverride)
+        cell, cell_value = cell_val_override(r["dimension_cell"], self.cellvalueoverride) 
+        return cell, cell_value

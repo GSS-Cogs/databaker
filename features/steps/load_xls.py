@@ -308,3 +308,18 @@ def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
 @then('it throws an error of type "{err_type}"')
 def step(context, err_type):
     assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
+
+@then(u'we are given the exception message')
+def step_impl(context):
+    same_char = False
+    for letter in range(0, len(context.text)):
+        a = context.text[letter]
+        b = str(context.exc)[letter]
+        if a == b:
+            same_char = True
+            next
+        else:
+            same_char = False
+            break
+    
+    assert same_char, f'Exception messages do not match. Expected: "{context.text}". Got: "{str(context.exc)}".'

@@ -1,5 +1,5 @@
 from databaker.constants import ABOVE, BELOW, LEFT, RIGHT, DIRECTION_DICT
-from databaker.lookupengines.cell_val_override import cell_val_override
+from databaker.lookupengines.generic import override_looked_up_cell
 
 class DirectLookupException(Exception):
     """Raised when a DIRECT lookup fails"""
@@ -141,17 +141,8 @@ class DirectlyEngine(object):
                                             " x:{}, y{}.".format(self.direction,cell.x, cell.y))
 
                     if self.last_cell_found is not None:
-
-                        # Apply str level cell value override if applicable
-                        #if self.last_cell_found.value in self.cellvalueoverride:
-                        #    value = self.cellvalueoverride[self.last_cell_found.value]
-                        #elif self.last_cell_found._cell in self.cellvalueoverride:
-                        #    value = self.cellvalueoverride[self.last_cell_found._cell]
-                        #else:
-                        #    value = self.last_cell_found.value
-
-                        #return self.last_cell_found, value
-                        return cell_val_override(self.last_cell_found, value)
+                        cell, cell_value = cell_val_override(r["dimension_cell"], self.cellvalueoverride) 
+                        return cell, cell_value
 
         # If we fall through to here the lookup has failed, raise an exception
         axis = "veritical" if DIRECTION_DICT[self.direction] in  ["ABOVE", "BELOW"] else "horizontal"
