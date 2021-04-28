@@ -203,9 +203,6 @@ def step_impl(context):
 def step_impl(context):
     assert "." not in str(cell_builder(str([str(v) for v in context.selections.values()][0]))), "{} \n\ncontains blank cells \n\n".format(str(cell_builder(str([str(v) for v in context.selections.values()][0]))))
 
-@then('it throws an error of type "{err_type}"')
-def step(context, err_type):
-    assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
 @then('the "{lookup_type}" dimension "{dimension_label}" has stored lookup information equal to')
 def step_impl(context, lookup_type, dimension_label):
 

@@ -237,5 +237,5 @@ Break points": {ordered_break_point_list}
 
             # Apply str level cell value override if applicable
 
-            cell, cell_value = cell_val_override(r["dimension_cell"], self.cellvalueoverride) 
+            cell, cell_value = override_looked_up_cell(r["dimension_cell"], self.cellvalueoverride) 
             return cell, cell_value

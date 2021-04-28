@@ -81,9 +81,9 @@ Scenario: Create a CONSTANT dimension
     Then all lookups to dimension "Constant1" should return the value "foo"
     And all lookups to dimension "Constant2" should return the value "bar"
 
-#Scenario 1
+# Within Scenario 1
 Scenario: Create a WITHIN ABOVE, right to left dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
@@ -98,9 +98,9 @@ Scenario: Create a WITHIN ABOVE, right to left dimensionsional lookup
     And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
     And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
 
-#Scenario 2
+# Within Scenario 2
 Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
@@ -115,9 +115,9 @@ Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
     And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
     And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
 
-#Scenario 3
+# Within Scenario 3
 Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
@@ -132,9 +132,9 @@ Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
     And the lookup from an observation in cell "G6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
     And the lookup from an observation in cell "I6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
 
-#Scenario 4
+# Within Scenario 4
 Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  
@@ -149,9 +149,9 @@ Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
     And the lookup from an observation in cell "G6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
     And the lookup from an observation in cell "I6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
 
-#Scenario 5
+# Within Scenario 5
 Scenario: Create a WITHIN ABOVE, right to left columns dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key                   | value                                    |  
@@ -166,9 +166,9 @@ Scenario: Create a WITHIN ABOVE, right to left columns dimensionsional lookup
     And the lookup from an observation in cell "I17" to the dimension "Birds and Fish" returns "{<A17 'Fish'>}"
     And the lookup from an observation in cell "I19" to the dimension "Birds and Fish" returns "{<A17 'Fish'>}"
 
-#Scenario 6
+# Within Scenario 6
 Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key                   | value                                    |  
@@ -183,9 +183,9 @@ Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
     And the lookup from an observation in cell "C17" to the dimension "Horses and Cows" returns "{<L17 'Cows'>}"
     And the lookup from an observation in cell "C19" to the dimension "Horses and Cows" returns "{<L17 'Cows'>}"
 
-#Scenario 7
+# Within Scenario 7
 Scenario: Create a WITHIN ABOVE, left to right columns dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key                   | value                                    |  
@@ -200,9 +200,9 @@ Scenario: Create a WITHIN ABOVE, left to right columns dimensionsional lookup
     And the lookup from an observation in cell "C17" to the dimension "Horses and Cows" returns "{<L17 'Cows'>}"
     And the lookup from an observation in cell "C19" to the dimension "Horses and Cows" returns "{<L17 'Cows'>}"
 
-#Scenario 8
+# Within Scenario 8
 Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key                   | value                                    |  
@@ -218,7 +218,7 @@ Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
     And the lookup from an observation in cell "I19" to the dimension "Birds and Fish" returns "{<A17 'Fish'>}"
 
 Scenario: Create a WITHIN dimensional lookup with 0 dimension selections
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key               | value                                   |  

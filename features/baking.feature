@@ -43,7 +43,7 @@ Feature: Produce a pandas dataframe containing all data values in the format of 
             | "bakingtestdataset.xls"     |
             | "bakingtestdataset.xlsx"    |
 
-    Scenario Outline: Complete the databaking process from a file object - produce a correct dataframe.
+    Scenario Outline: Complete the databaking process from a file object - produce a correct dataframe
         Given we use a file object created from <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as

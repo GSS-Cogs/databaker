@@ -134,7 +134,6 @@ class WithinEngine(object):
 
         self.sequence = self._sequencer(cell_bag)  # see docstring
 
-    # test me!
     # scenario 1
     def _xy_traveling_up_and_left(self):
         """
@@ -145,7 +144,6 @@ class WithinEngine(object):
             for x_offset in range(self.table_width, -1, -1):
                 yield x_offset, y_offset
 
-    # test me!
     # Scenario 2
     def _xy_traveling_up_and_right(self):
         """
@@ -338,5 +336,5 @@ class WithinEngine(object):
             raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
                         f' and we were scanning {DIRECTION_DICT[self.direction_of_travel]} but no header cell was found in the specified range.')
 
-        cell, cell_value = cell_val_override(r["dimension_cell"], self.cellvalueoverride) 
+        cell, cell_value = override_looked_up_cell(found_cell, self.cellvalueoverride) 
         return cell, cell_value

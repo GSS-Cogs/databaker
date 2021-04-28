@@ -141,7 +141,7 @@ class DirectlyEngine(object):
                                             " x:{}, y{}.".format(self.direction,cell.x, cell.y))
 
                     if self.last_cell_found is not None:
-                        cell, cell_value = cell_val_override(r["dimension_cell"], self.cellvalueoverride) 
+                        cell, cell_value = override_looked_up_cell(self.last_cell_found, self.cellvalueoverride) 
                         return cell, cell_value
 
         # If we fall through to here the lookup has failed, raise an exception
