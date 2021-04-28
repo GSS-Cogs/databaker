@@ -56,6 +56,7 @@ def loadxlstabs(input, sheetids="*", verbose=True):
         assert len(sheetids) == len(tabnames), ("Number of selected tables disagree", "len(sheetids) == len(tabnames)", len(sheetids), len(tabnames))
     if len(set(tabnames)) != len(tabnames):
         warnings.warn("Duplicates found in table names list")
+
     return tabs
 
 DATABAKER_INPUT_FILE = None

@@ -34,8 +34,6 @@ def cell_builder(cell_list):
             cell_set.add(cell)
     return(cell_set)
 
-#Tag we can give to step definitions (see: @given(u'we define cell selections as'))
-#Which will catch any exceptions which occur during the step execution.
 def catch_all(func):
     def wrapper(context, *args, **kwargs):
         try:
@@ -205,9 +203,6 @@ def step_impl(context):
 def step_impl(context):
     assert "." not in str(cell_builder(str([str(v) for v in context.selections.values()][0]))), "{} \n\ncontains blank cells \n\n".format(str(cell_builder(str([str(v) for v in context.selections.values()][0]))))
 
-@then('it throws an error of type "{err_type}"')
-def step(context, err_type):
-    assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
 @then('the "{lookup_type}" dimension "{dimension_label}" has stored lookup information equal to')
 def step_impl(context, lookup_type, dimension_label):
 
@@ -309,3 +304,46 @@ Expected:
 {expected_err_str}
         """
         assert got_err_str == expected_err_str, msg
+
+
+@then('the lookup from an observation in cell "{ob_cell_excel_ref}" to the dimension "{dimension_name}" returns "{expecting}"')
+@catch_all
+def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
+    dimension = [x for x in context.dimensions if x.name == dimension_name]
+    assert len(dimension) == 1, f'Could not find a dimension named {dimension_name}'
+    dimension = dimension[0]
+
+    observation_selection = [context.selections[x] for x in context.selections if x == "observations"][0]
+    ob_cell = None
+    for cell in observation_selection:
+        if xypath.contrib.excel.excel_location(cell) == ob_cell_excel_ref:
+            ob_cell = cell
+            break
+    else:
+        raise ValueError(f'Could not find a selected observation cell for excel reference {ob_cell_excel_ref}')
+
+    assert ob_cell is not None
+
+    looked_up_cell, _ = dimension.celllookup(ob_cell)
+    assert str(looked_up_cell) == expecting, f'Got {str(looked_up_cell)}, expected {expecting}'
+
+
+@then('it throws an error of type "{err_type}"')
+def step(context, err_type):
+    assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
+
+
+@then(u'we are given the exception message')
+def step_impl(context):
+    same_char = False
+    for letter in range(0, len(context.text)):
+        a = context.text[letter]
+        b = str(context.exc)[letter]
+        if a == b:
+            same_char = True
+            next
+        else:
+            same_char = False
+            break
+    
+    assert same_char, f'Exception messages do not match. Expected: "{context.text}". Got: "{str(context.exc)}".'
