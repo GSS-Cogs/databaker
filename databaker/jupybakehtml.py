@@ -86,16 +86,26 @@ def tabletohtml(tab, tsubs, consolidatedcellvalueoverride, blocalstylesheet):
             ih = ixyheaderlookup.get((c.x, c.y))
             if blocalstylesheet:
                 cs = [ ]
-                if ih is not None:             cs.append("xc%s" % ih)
-                if c.properties.cell.sheet.book.font_list:  # overcome bug in messytables caused by https://www.communities-ni.gov.uk/sites/default/files/publications/communities/ni-housing-stats-15-16-tables1.xlsx
-                    if c.properties.get_bold():    cs.append("xb")
-                if c.is_number():              cs.append("xn")
+                if ih is not None:
+                    cs.append("xc%s" % ih)
+                try:
+                    if c.properties.cell.sheet.book.font_list:  # overcome bug in messytables caused by https://www.communities-ni.gov.uk/sites/default/files/publications/communities/ni-housing-stats-15-16-tables1.xlsx
+                        if c.properties.get_bold():
+                            cs.append("xb")
+                except Exception:
+                    raise(type(c.properties))
+                if c.is_number():
+                    cs.append("xn")
                 htm.append('<td class="%s" title="%d %d">' % (" ".join(cs), c.x, c.y))
             else:
                 ls = [ ]
-                if ih is not None:             ls.append("background-color:%s" % colourlist.get(ih,"white"))
-                if c.properties.cell.sheet.book.font_list:
-                    if c.properties.get_bold():    ls.append("font-weight:bold")
+                if ih is not None:
+                    ls.append("background-color:%s" % colourlist.get(ih,"white"))
+                try:
+                    if c.properties.get_bold():
+                        ls.append("font-weight:bold")
+                except Exception:
+                    raise ValueError(type(c.properties))
                 lss = ' style="%s"' % ";".join(ls)  if ls  else ''
                 htm.append('<td%s title="%d %d">' % (lss, c.x, c.y))
                 
