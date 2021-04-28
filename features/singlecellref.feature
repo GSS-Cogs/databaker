@@ -1,9 +1,9 @@
 Feature: Define a dimension as a value from a single cell reference.
   I want to be able to define a dimension as a value from a single cell reference which stays constant for all observations.
 
-  Scenario: Define unit from single cell reference.
-    Given we load an xls file named "bulletindataset2v2.xls"
-    And select the sheet "Table 2a"
+  Scenario Outline: Define unit from single cell reference.
+    Given we load a file named <File Name>
+    And select the sheet "Sheet2"
     And we define cell selections as
       | key             | value                                   |  
       | unit            | tab.excel_ref("P5")                     |
@@ -15,3 +15,8 @@ Feature: Define a dimension as a value from a single cell reference.
     """
     {<P5 '(£Million)'>}
     """
+
+    Examples: File Types
+      | File Name                   |
+      | "bakingtestdataset.xls"     |
+      | "bakingtestdataset.xlsx"    |

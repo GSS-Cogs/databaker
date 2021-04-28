@@ -11,6 +11,7 @@ from databaker.structure_csv_default import *
 from databaker.constants import *
 from databaker.overrides import *
 
+
 def get_fixture(file_name):
     """Helper to get specific files out of the fixtures dir"""
     feature_path = Path(os.path.dirname(os.path.abspath(__file__))).parent
@@ -43,11 +44,18 @@ def catch_all(func):
 
     return wrapper
 
-@given('we load an xls file named "{xls_file}"')
-def step_impl(context, xls_file):
-    path_to_xls = get_fixture(xls_file)
-    context.last_xls_loaded = path_to_xls
-    context.tabs = loadxlstabs(path_to_xls)
+@given('we load a file named "{sheet}"')
+def step_impl(context, sheet):
+    path_to_sheet = get_fixture(sheet)
+    context.last_xls_loaded = path_to_sheet
+    context.tabs = loadxlstabs(path_to_sheet)
+
+@given(u'we use a file object created from "{sheet}"')
+def step_impl(context, sheet):
+    path_to_sheet = get_fixture(sheet)
+    context.last_xls_loaded = path_to_sheet
+    with open(path_to_sheet, 'rb') as f:
+        context.tabs = loadxlstabs(f)
 
 @given('select the sheet "{sheet_wanted}"')
 def step_impl(context, sheet_wanted):
@@ -69,7 +77,9 @@ def step_impl(context):
     assert len(context.tabs) == len(tabs_wanted)
 
 #From the tab, define all dimensions and observations in the usual transform manner.
+#Catch any exceptions which occur during this process.
 @given(u'we define cell selections as')
+@catch_all
 def step_impl(context):
     tab = context.tab_selected
     context.selections = {}
@@ -152,6 +162,16 @@ def step_impl(context):
 
     assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(str(actual), str(expected))
 
+@then(u'we confirm the types of the selected cell values are correct')
+def step_impl(context):
+    expected = context.text
+    types = [type(k.value) for k in context.selections["year"]]
+    types_got = set((types))
+    assert len(types_got) == 1, "Aborting: more than one type in time selection."
+    actual = str(next(iter(types_got)))
+
+    assert expected == actual, "{} \n\ndoes not match the expected type \n\n {}\n".format(actual, expected)
+
 
 @then(u'we confirm the cell selection is equal to')
 def step_impl(context):
@@ -170,6 +190,7 @@ def step_impl(context):
 
 @then(u'we confirm the cell selection contains "{num_of_cells}" cells.')
 def step_impl(context, num_of_cells):
+    print(context.selections)
     assert len(cell_builder(str([str(v) for v in context.selections.values()][0]))) == int(num_of_cells), "{} \n\nbag contains unexpected number of cells \n\n {}\n".format(len(cell_builder(str([str(v) for v in context.selections.values()][0]))), str(num_of_cells))
 
 
@@ -182,6 +203,9 @@ def step_impl(context):
 def step_impl(context):
     assert "." not in str(cell_builder(str([str(v) for v in context.selections.values()][0]))), "{} \n\ncontains blank cells \n\n".format(str(cell_builder(str([str(v) for v in context.selections.values()][0]))))
 
+@then('it throws an error of type "{err_type}"')
+def step(context, err_type):
+    assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
 @then('the "{lookup_type}" dimension "{dimension_label}" has stored lookup information equal to')
 def step_impl(context, lookup_type, dimension_label):
 
@@ -284,6 +308,7 @@ Expected:
         """
         assert got_err_str == expected_err_str, msg
 
+
 @then('the lookup from an observation in cell "{ob_cell_excel_ref}" to the dimension "{dimension_name}" returns "{expecting}"')
 @catch_all
 def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
@@ -305,9 +330,11 @@ def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
     looked_up_cell, _ = dimension.celllookup(ob_cell)
     assert str(looked_up_cell) == expecting, f'Got {str(looked_up_cell)}, expected {expecting}'
 
+
 @then('it throws an error of type "{err_type}"')
 def step(context, err_type):
     assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
+
 
 @then(u'we are given the exception message')
 def step_impl(context):

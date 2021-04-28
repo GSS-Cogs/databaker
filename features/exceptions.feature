@@ -2,7 +2,7 @@ Feature: User friendly exceptions
   I want databaker to create user friendly exceptions where a problem is encountered.
 
 Scenario: A DIRECTLY lookup to where a cell does not exist
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                                   |
@@ -19,7 +19,7 @@ Scenario: A DIRECTLY lookup to where a cell does not exist
         """
 
 Scenario: A CLOSEST lookup where there are no dimension cells in the stated direction
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                           |
@@ -36,7 +36,7 @@ Scenario: A CLOSEST lookup where there are no dimension cells in the stated dire
         """
 
 Scenario: Create a CLOSEST lookup with an empty bag of cells
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                                              |
@@ -48,7 +48,7 @@ Scenario: Create a CLOSEST lookup with an empty bag of cells
         """
 
 Scenario: Create a DIRECTLY lookup with an empty bag of cells
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                                             |
@@ -60,7 +60,7 @@ Scenario: Create a DIRECTLY lookup with an empty bag of cells
         """
 
 Scenario: Create a CLOSEST lookup with two equally close cells
-    Given we load an xls file named "bakingtestdataset.xls"
+    Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
         | key             | value                                 |
