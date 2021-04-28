@@ -7,8 +7,6 @@ import xypath
 from databaker import richxlrd
 template = databaker.constants.template
 
-import logging
-
 from databaker.constants import ABOVE, BELOW, LEFT, RIGHT, ClosestEngine, DirectlyEngine
 from databaker.lookupengines.constant import ConstantEngine
 from databaker.lookupengines.within import WITHIN, WithinEngine
@@ -41,8 +39,6 @@ class HDim:
         self.hbagset = hbagset
 
         self.cellvalueoverride = cellvalueoverride or {} # do not put {} into default value otherwise there is only one static one for everything
-
-        logging.warning(engine)
 
         # For every dimension, create an appropriate lookup engine
         # Note: I don't particularly like low level matching on __name__ here, but we're matching on a mix of types and

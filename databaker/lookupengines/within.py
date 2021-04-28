@@ -246,10 +246,6 @@ class WithinEngine(object):
         self.table_height = max([cell.y for cell in pristine_table])
         self.table_width = max([cell.x for cell in pristine_table])
 
-        # TODO - we need to take a hard look at refactoring this for performance when its all working!
-        # I doubt this is even remotely efficient (so lets get the tests working, then we're free to rip the following to bits and make it faster)
-        
-
         def build_sequence(sequence_generator_method):
             sequence = []
             for (x_offset, y_offset) in sequence_generator_method:

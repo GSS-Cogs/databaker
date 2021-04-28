@@ -20,8 +20,8 @@ DIRECTION_DICT = {
                 (-1, 0): "LEFT"
              }
 
-# TODO - don't like the imports down here, but these engine are dependant
-# on the above constants beiung in state. Needs a little unpicking.
+# TODO - don't like the imports down here, but these engines are dependant on the
+# above constants being in state. Needs a little unpicking in the longer term.
 from databaker.lookupengines.closest import ClosestEngine
 from databaker.lookupengines.directly import DirectlyEngine
 
