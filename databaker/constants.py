@@ -9,14 +9,10 @@ except ImportError:
     from .structure_csv_default import *
     from . import structure_csv_default as template
 
-
 ABOVE = UP
 BELOW = DOWN
 
-DIRECTLY = True
-CLOSEST = False
-
-# convenience function for logging out directions
+# connvenience function for logging out directions
 DIRECTION_DICT = {
                 (0, -1): "ABOVE",
                 (1, 0): "RIGHT",
@@ -24,4 +20,11 @@ DIRECTION_DICT = {
                 (-1, 0): "LEFT"
              }
 
+# TODO - don't like the imports down here, but these engine are dependant
+# on the above constants beiung in state. Needs a little unpicking.
+from databaker.lookupengines.closest import ClosestEngine
+from databaker.lookupengines.directly import DirectlyEngine
+
+DIRECTLY = DirectlyEngine
+CLOSEST = ClosestEngine
 

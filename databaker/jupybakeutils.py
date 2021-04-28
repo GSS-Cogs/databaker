@@ -7,9 +7,9 @@ import xypath
 from databaker import richxlrd
 template = databaker.constants.template
 
-from databaker.constants import ABOVE, BELOW, LEFT, RIGHT
-from databaker.lookupengines.closest import ClosestEngine
-from databaker.lookupengines.directly import DirectlyEngine
+import logging
+
+from databaker.constants import ABOVE, BELOW, LEFT, RIGHT, ClosestEngine, DirectlyEngine
 from databaker.lookupengines.constant import ConstantEngine
 from databaker.lookupengines.within import WITHIN, WithinEngine
 
@@ -35,36 +35,37 @@ def svalue(cell):
 
 class HDim:
     "Dimension object which defines the lookup between an observation cell and a bag of header cells"
-    def __init__(self, hbagset, label, strict=None, direction=None, cellvalueoverride=None, constant=False):
+    def __init__(self, hbagset, label, engine=None, direction=None, cellvalueoverride=None):
         self.label = label
         self.name = label
         self.hbagset = hbagset
 
         self.cellvalueoverride = cellvalueoverride or {} # do not put {} into default value otherwise there is only one static one for everything
 
-        # For every dimension, create an appropriate lookup engine
+        logging.warning(engine)
 
-        # TODO - I dislike this old repackaging of strict as its referring to a boolean and we're rending that nonsensical by
-        # sometimes passing a WITHIN object, nevertheless it'll do for now
-        if isinstance(strict, WITHIN):
-            starting_offset, ending_offset, direction_of_travel = strict.unpack()
+        # For every dimension, create an appropriate lookup engine
+        # Note: I don't particularly like low level matching on __name__ here, but we're matching on a mix of types and
+        # instantiation here and it's giving me headaches.
+        # TODO: better, must be a cleaner way.
+        if isinstance(engine, WITHIN):
+            starting_offset, ending_offset, direction_of_travel = engine.unpack()
             self.engine = WithinEngine(hbagset, direction, label, starting_offset, ending_offset, direction_of_travel, self.cellvalueoverride)
-        elif constant:
-            assert direction is None and strict is None
-            self.engine = ConstantEngine(self.cellvalueoverride)
-        elif strict:
+        elif engine.__name__ is DirectlyEngine.__name__:
             self.engine = DirectlyEngine(hbagset, direction, label, self.cellvalueoverride)
-        elif not strict:
+        elif engine.__name__ is ClosestEngine.__name__:
             self.engine = ClosestEngine(hbagset, direction, label, self.cellvalueoverride)
+        elif engine.__name__ is ConstantEngine.__name__:
+            self.engine = ConstantEngine(self.cellvalueoverride)
         else:
-            raise ValueError("Aborting. Unable to find appropriate lookup engine.")
+            raise ValueError(f'Aborting. Unable to find appropriate lookup engine. Got {engine}')
             
         assert not isinstance(hbagset, str), "Use HDimConst for a single value dimension"
         self.bhbagsetCopied = False
         
         # Sanity checks for HDim
         if self.hbagset is not None:
-            assert direction is not None and strict is not None
+            assert direction is not None and engine is not None
             assert isinstance(self.hbagset, xypath.xypath.Bag), "dimension should be made from xypath.Bag type, not %s" % type(self.hbagset)
 
             
@@ -172,7 +173,7 @@ class HDim:
 
 def HDimConst(name, val):
     "Define a constant value dimension across the whole segment"
-    return HDim(None, name, cellvalueoverride={None:val}, constant=True)
+    return HDim(None, name, cellvalueoverride={None:val}, engine=ConstantEngine)
 
 
 def Ldatetimeunitloose(date):
