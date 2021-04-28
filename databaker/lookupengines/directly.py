@@ -1,5 +1,5 @@
 from databaker.constants import ABOVE, BELOW, LEFT, RIGHT, DIRECTION_DICT
-from databaker.lookupengines.generic import override_looked_up_cell
+from databaker.lookupengines.generic import override_looked_up_cell, unpack_callables
 
 class DirectLookupException(Exception):
     """Raised when a DIRECT lookup fails"""
@@ -9,7 +9,7 @@ class DirectLookupException(Exception):
 
 class DirectlyEngine(object):
 
-    def __init__(self, cell_bag, direction, label, cellvalueoverride):
+    def __init__(self, cell_bag, direction, label, cellvalueoverride, apply):
         """
         We're going to write the cell_bag into a tiered dictionary (you
         could use a flat dictionary, but this'll be quicker).
@@ -38,6 +38,7 @@ class DirectlyEngine(object):
         self.direction = direction
         self.label = label
         self.cellvalueoverride = cellvalueoverride if cellvalueoverride is not None else {}
+        self.apply_functions = unpack_callables(apply)
 
         self.tiered_dict = {}
 
@@ -141,7 +142,8 @@ class DirectlyEngine(object):
                                             " x:{}, y{}.".format(self.direction,cell.x, cell.y))
 
                     if self.last_cell_found is not None:
-                        cell, cell_value = override_looked_up_cell(self.last_cell_found, self.cellvalueoverride) 
+                        cell, cell_value = override_looked_up_cell(self.last_cell_found, self.cellvalueoverride,
+                                                self.apply_functions) 
                         return cell, cell_value
 
         # If we fall through to here the lookup has failed, raise an exception
