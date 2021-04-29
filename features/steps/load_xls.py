@@ -327,11 +327,33 @@ def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
     looked_up_cell, _ = dimension.celllookup(ob_cell)
     assert str(looked_up_cell) == expecting, f'Got {str(looked_up_cell)}, expected {expecting}'
 
+@then('the lookup from an observation in cell "{ob_cell_excel_ref}" to the dimension "{dimension_name}" returns the value "{expecting}"')
+def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
+    dimension = [x for x in context.dimensions if x.name == dimension_name]
+    assert len(dimension) == 1, f'Could not find a dimension named {dimension_name}'
+    dimension = dimension[0]
+
+    observation_selection = [context.selections[x] for x in context.selections if x == "observations"][0]
+    ob_cell = None
+    for cell in observation_selection:
+        if xypath.contrib.excel.excel_location(cell) == ob_cell_excel_ref:
+            ob_cell = cell
+            break
+    else:
+        raise ValueError(f'Could not find a selected observation cell for excel reference {ob_cell_excel_ref}')
+
+    assert ob_cell is not None
+
+    _, obs_value = dimension.celllookup(ob_cell)
+    assert obs_value == expecting, f'Got "{obs_value}", expected "{expecting}"'
 
 @then('it throws an error of type "{err_type}"')
 def step(context, err_type):
     assert type(context.exc) == eval(err_type), f'Unexpected error type. Expected: "{type(context.exc)}". Got: "{eval(err_type)}".'
 
+@then('it throws an error containing the text "{err_text}"')
+def step(context, err_text):
+    assert err_text in str(context.exc), f'Expected error text "{err_text}", not found in {str(context.exc)}".'
 
 @then(u'we are given the exception message')
 def step_impl(context):

@@ -33,7 +33,7 @@ def svalue(cell):
 
 class HDim:
     "Dimension object which defines the lookup between an observation cell and a bag of header cells"
-    def __init__(self, hbagset, label, engine=None, direction=None, cellvalueoverride=None):
+    def __init__(self, hbagset, label, engine=None, direction=None, cellvalueoverride=None, apply=None):
         self.label = label
         self.name = label
         self.hbagset = hbagset
@@ -46,11 +46,11 @@ class HDim:
         # TODO: better, must be a cleaner way.
         if isinstance(engine, WITHIN):
             starting_offset, ending_offset, direction_of_travel = engine.unpack()
-            self.engine = WithinEngine(hbagset, direction, label, starting_offset, ending_offset, direction_of_travel, self.cellvalueoverride)
+            self.engine = WithinEngine(hbagset, direction, label, starting_offset, ending_offset, direction_of_travel, self.cellvalueoverride, apply)
         elif engine.__name__ is DirectlyEngine.__name__:
-            self.engine = DirectlyEngine(hbagset, direction, label, self.cellvalueoverride)
+            self.engine = DirectlyEngine(hbagset, direction, label, self.cellvalueoverride, apply)
         elif engine.__name__ is ClosestEngine.__name__:
-            self.engine = ClosestEngine(hbagset, direction, label, self.cellvalueoverride)
+            self.engine = ClosestEngine(hbagset, direction, label, self.cellvalueoverride, apply)
         elif engine.__name__ is ConstantEngine.__name__:
             self.engine = ConstantEngine(self.cellvalueoverride)
         else:

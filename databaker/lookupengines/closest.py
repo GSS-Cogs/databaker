@@ -1,7 +1,7 @@
 import json
 
 from databaker.constants import ABOVE, BELOW, LEFT, RIGHT, DIRECTION_DICT
-from databaker.lookupengines.generic import override_looked_up_cell
+from databaker.lookupengines.generic import override_looked_up_cell, unpack_callables
 
 class BoundaryError(Exception):
     """ Raised when attempting to lookup outside the bounds of where a lookup can exist"""
@@ -10,7 +10,7 @@ class BoundaryError(Exception):
 
 class ClosestEngine(object):
 
-    def __init__(self, cell_bag, direction, label, cellvalueoverride):
+    def __init__(self, cell_bag, direction, label, cellvalueoverride, apply):
         """
         Creates a lookup engine for dimensions defined with the CLOSEST relationship.
 
@@ -48,6 +48,7 @@ class ClosestEngine(object):
         self.direction = direction
         self.label = label
         self.cellvalueoverride = cellvalueoverride if cellvalueoverride is not None else {}
+        self.apply_functions = unpack_callables(apply)
 
         assert len(cell_bag) > 0, f'Aborting. The dimension {self.label} is defined as CLOSEST ' \
                     + f'{DIRECTION_DICT[self.direction]} but an empty selection of cells has been ' \
@@ -237,5 +238,6 @@ Break points": {ordered_break_point_list}
 
             # Apply str level cell value override if applicable
 
-            cell, cell_value = override_looked_up_cell(r["dimension_cell"], self.cellvalueoverride) 
+            cell, cell_value = override_looked_up_cell(r["dimension_cell"], self.cellvalueoverride,
+                                    self.apply_functions) 
             return cell, cell_value

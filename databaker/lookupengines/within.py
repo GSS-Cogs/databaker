@@ -1,6 +1,6 @@
 
 from databaker.constants import ABOVE, BELOW, UP, DOWN, LEFT, RIGHT, DIRECTION_DICT
-from databaker.lookupengines.generic import override_looked_up_cell
+from databaker.lookupengines.generic import override_looked_up_cell, unpack_callables
 
 # Essentially a factory function for the actual WithinEngine
 # I don't particularly like breaking the python convention of UPPERCLASS == a constant
@@ -88,8 +88,7 @@ class WITHIN(object):
 
 class WithinEngine(object):
     
-    def __init__(self, cell_bag, direction, label, starting_offset, ending_offset, direction_of_travel, cellvalueoverride):
-        self.cellvalueoverride = cellvalueoverride
+    def __init__(self, cell_bag, direction, label, starting_offset, ending_offset, direction_of_travel, cellvalueoverride, apply):
         """
         Creates a lookup engine to resolve a WITHIN(<a given range of offsets>) lookup.
 
@@ -131,6 +130,7 @@ class WithinEngine(object):
         self.direction_of_travel = direction_of_travel
         self.cellvalueoverride = cellvalueoverride
         self.cell_bag = cell_bag
+        self.apply_functions = unpack_callables(apply)
 
         self.sequence = self._sequencer(cell_bag)  # see docstring
 
@@ -332,5 +332,5 @@ class WithinEngine(object):
             raise ValueError(f'Unsuccessful within lookup for cell {cell} in dimension "{self.label}". Direction was {DIRECTION_DICT[self.direction]}'
                         f' and we were scanning {DIRECTION_DICT[self.direction_of_travel]} but no header cell was found in the specified range.')
 
-        cell, cell_value = override_looked_up_cell(found_cell, self.cellvalueoverride) 
+        cell, cell_value = override_looked_up_cell(found_cell, self.cellvalueoverride, self.apply_functions) 
         return cell, cell_value
