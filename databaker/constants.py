@@ -24,7 +24,7 @@ DIRECTION_DICT = {
 # above constants being in state. Needs a little unpicking in the longer term.
 from databaker.lookupengines.closest import ClosestEngine
 from databaker.lookupengines.directly import DirectlyEngine
+from databaker.lookupengines.within import WITHIN
 
 DIRECTLY = DirectlyEngine
 CLOSEST = ClosestEngine
-
