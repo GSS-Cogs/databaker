@@ -53,22 +53,26 @@ class WITHIN(object):
         if left is not None:
             # Consider the kwargs in the order they were recieved
             for k, v in kwargs.items():
-                self.starting_offset = kwargs["left"]
-                self.ending_offset = kwargs["right"]
                 if k == "left":
+                    self.starting_offset = kwargs["left"]
+                    self.ending_offset = kwargs["right"]
                     self.direction_of_travel = RIGHT
                     break
                 if k == "right":
+                    self.starting_offset = kwargs["right"]
+                    self.ending_offset = kwargs["left"]
                     self.direction_of_travel = LEFT
                     break
         elif above is not None:
-            self.starting_offset = kwargs["above"]
-            self.ending_offset = kwargs["below"]
             for k, v in kwargs.items():
                 if k == "above":
+                    self.starting_offset = kwargs["above"]
+                    self.ending_offset = kwargs["below"]
                     self.direction_of_travel = DOWN
                     break
                 if k == "below":
+                    self.starting_offset = kwargs["below"]
+                    self.ending_offset = kwargs["above"]
                     self.direction_of_travel = UP
                     break
         else:
