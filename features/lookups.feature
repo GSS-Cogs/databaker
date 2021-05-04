@@ -234,3 +234,23 @@ Scenario: Create a WITHIN dimensional lookup with 0 dimension selections
         """
         Unsuccessful within lookup for cell {<C6 1.0>} in dimension "Sheep and Ducks". Direction was BELOW and we were scanning LEFT but no header cell was found in the specified range.
         """
+
+Scenario: Create a complex series of WITHIN dimensional lookups
+    Given we load a file named "complexwithinexample.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                                    |  
+        | observations      | tab.excel_ref("C4:J35").is_not_blank()                   |
+        | month             | tab.excel_ref("A").one_of(["Jan", "Jul"])                |
+        | year              | tab.excel_ref("A").one_of( ["2019.0", "2020.0", "2021"]  |
+    And we define the dimensions as
+        """
+        HDim(month, "Month", WITHIN(below=1, above=6), LEFT)
+        HDim(month, "Year", WITHIN(below=2, above=5), LEFT)
+        """
+    Then the lookup from an observation in cell "D8" to the dimension "Month" returns "{<A5 'Jan'>}"
+    And the lookup from an observation in cell "D8" to the dimension "Year" returns "{<A6 '2019.0'>}"
+    And the lookup from an observation in cell "D10" to the dimension "Month" returns "{<A11 'Jul'>}"
+    And the lookup from an observation in cell "D10" to the dimension "Year" returns "{<A12 '2019.0'>}"
+    And the lookup from an observation in cell "H35" to the dimension "Month" returns "{<A29 'Jan'>}"
+    And the lookup from an observation in cell "H35" to the dimension "Year" returns "{<A30 '2021.0'>}"
