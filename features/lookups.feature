@@ -99,7 +99,7 @@ Scenario: Create a WITHIN ABOVE, right to left dimensionsional lookup
     And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
 
 # Within Scenario 2
-Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
+Scenario: Create a WITHIN ABOVE, left to right lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -116,7 +116,7 @@ Scenario: Create a WITHIN ABOVE, left to right dimensionsional lookup
     And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns "{<I3 'Dogs'>}"
 
 # Within Scenario 3
-Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
+Scenario: Create a WITHIN BELOW, right to left lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -133,7 +133,7 @@ Scenario: Create a WITHIN BELOW, right to left dimensionsional lookup
     And the lookup from an observation in cell "I6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
 
 # Within Scenario 4
-Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
+Scenario: Create a WITHIN BELOW, left to right lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -150,16 +150,16 @@ Scenario: Create a WITHIN BELOW, left to right dimensionsional lookup
     And the lookup from an observation in cell "I6" to the dimension "Sheep and Ducks" returns "{<I28 'Ducks'>}"
 
 # Within Scenario 5
-Scenario: Create a WITHIN ABOVE, right to left columns dimensionsional lookup
+Scenario: Create a WITHIN LEFT, below to above lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
-        | key                   | value                                    |  
-        | birds_and_fish        | tab.excel_ref("A").is_not_blank()        |
-        | observations          | tab.excel_ref("C6:I25")                  |
+        | key                   | value                                         |  
+        | birds_and_fish        | tab.excel_ref("A").one_of(["Fish", "Birds"])  |
+        | observations          | tab.excel_ref("C6:I25")                       |
     And we define the dimensions as
         """
-        HDim(birds_and_fish, "Birds and Fish", WITHIN(below=2, above=1), LEFT)
+        HDim(birds_and_fish, "Birds and Fish", WITHIN(below=3, above=4), LEFT)
         """
     Then the lookup from an observation in cell "I7" to the dimension "Birds and Fish" returns "{<A10 'Birds'>}"
     And the lookup from an observation in cell "I10" to the dimension "Birds and Fish" returns "{<A10 'Birds'>}"
@@ -167,7 +167,7 @@ Scenario: Create a WITHIN ABOVE, right to left columns dimensionsional lookup
     And the lookup from an observation in cell "I19" to the dimension "Birds and Fish" returns "{<A17 'Fish'>}"
 
 # Within Scenario 6
-Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
+Scenario: Create a WITHIN RIGHT, above to below lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -176,7 +176,7 @@ Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
         | observations          | tab.excel_ref("C6:I25")                  |
     And we define the dimensions as
         """
-        HDim(horses_and_cows, "Horses and Cows", WITHIN(above=1, below=2), RIGHT)
+        HDim(horses_and_cows, "Horses and Cows", WITHIN(above=3, below=3), RIGHT)
         """
     Then the lookup from an observation in cell "C7" to the dimension "Horses and Cows" returns "{<L10 'Horses'>}"
     And the lookup from an observation in cell "C10" to the dimension "Horses and Cows" returns "{<L10 'Horses'>}"
@@ -184,7 +184,7 @@ Scenario: Create a WITHIN BELOW, left to right columns dimensionsional lookup
     And the lookup from an observation in cell "C19" to the dimension "Horses and Cows" returns "{<L17 'Cows'>}"
 
 # Within Scenario 7
-Scenario: Create a WITHIN ABOVE, left to right columns dimensionsional lookup
+Scenario: Create a WITHIN RIGHT, below to above lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -193,7 +193,7 @@ Scenario: Create a WITHIN ABOVE, left to right columns dimensionsional lookup
         | observations          | tab.excel_ref("C6:I25")                  |
     And we define the dimensions as
         """
-        HDim(horses_and_cows, "Horses and Cows", WITHIN(below=2, above=1), RIGHT)
+        HDim(horses_and_cows, "Horses and Cows", WITHIN(below=3, above=3), RIGHT)
         """
     Then the lookup from an observation in cell "C7" to the dimension "Horses and Cows" returns "{<L10 'Horses'>}"
     And the lookup from an observation in cell "C10" to the dimension "Horses and Cows" returns "{<L10 'Horses'>}"
@@ -201,7 +201,7 @@ Scenario: Create a WITHIN ABOVE, left to right columns dimensionsional lookup
     And the lookup from an observation in cell "C19" to the dimension "Horses and Cows" returns "{<L17 'Cows'>}"
 
 # Within Scenario 8
-Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
+Scenario: Create a WITHIN LEFT, above to below lookup
     Given we load a file named "bakingtestdataset.xls"
     And select the sheet "Sheet1"
     And we define cell selections as
@@ -210,12 +210,32 @@ Scenario: Create a WITHIN BELOW, right to left columns dimensionsional lookup
         | observations          | tab.excel_ref("C6:I25")                  |
     And we define the dimensions as
         """
-        HDim(birds_and_fish, "Birds and Fish", WITHIN(above=1, below=2), LEFT)
+        HDim(birds_and_fish, "Birds and Fish", WITHIN(above=3, below=4), LEFT)
         """
     Then the lookup from an observation in cell "I7" to the dimension "Birds and Fish" returns "{<A10 'Birds'>}"
     And the lookup from an observation in cell "I10" to the dimension "Birds and Fish" returns "{<A10 'Birds'>}"
     And the lookup from an observation in cell "I17" to the dimension "Birds and Fish" returns "{<A17 'Fish'>}"
     And the lookup from an observation in cell "I19" to the dimension "Birds and Fish" returns "{<A17 'Fish'>}"
+
+Scenario: Create a complex series of WITHIN dimensional lookups
+    Given we load a file named "complexwithinexample.xls"
+    And select the sheet "Sheet1"
+    And we define cell selections as
+        | key               | value                                                    |  
+        | observations      | tab.excel_ref("C4:J35").is_not_blank()                   |
+        | month             | tab.excel_ref("A").one_of(["Jan", "Jul"])                |
+        | year              | tab.excel_ref("A").one_of(["2019.0", "2020.0", "2021.0"])  |
+    And we define the dimensions as
+        """
+        HDim(month, "Month", WITHIN(below=1, above=6), LEFT)
+        HDim(year, "Year", WITHIN(below=2, above=5), LEFT)
+        """
+    Then the lookup from an observation in cell "D8" to the dimension "Month" returns "{<A5 'Jan'>}"
+    And the lookup from an observation in cell "D8" to the dimension "Year" returns "{<A6 2019.0>}"
+    And the lookup from an observation in cell "D10" to the dimension "Month" returns "{<A11 'Jul'>}"
+    And the lookup from an observation in cell "D10" to the dimension "Year" returns "{<A12 2019.0>}"
+    And the lookup from an observation in cell "H35" to the dimension "Month" returns "{<A29 'Jan'>}"
+    And the lookup from an observation in cell "H35" to the dimension "Year" returns "{<A30 2021.0>}"
 
 Scenario: Create a WITHIN dimensional lookup with 0 dimension selections
     Given we load a file named "bakingtestdataset.xls"
@@ -228,29 +248,8 @@ Scenario: Create a WITHIN dimensional lookup with 0 dimension selections
         """
         HDim(sheep_and_ducks, "Sheep and Ducks", WITHIN(right=2, left=1), BELOW)
         """
-    Then the lookup from an observation in cell "C6" to the dimension "Sheep and Ducks" returns "{<E28 'Sheep'>}"
-    And it throws an error of type "ValueError"
-    And we are given the exception message
+    And we create a ConversionSegment object.
+    Then we attempt to extract the dimensions, capturing the first exception as
         """
-        Unsuccessful within lookup for cell {<C6 1.0>} in dimension "Sheep and Ducks". Direction was BELOW and we were scanning LEFT but no header cell was found in the specified range.
+        Unsuccessful within lookup for cell <C6 1.0> in dimension "Sheep and Ducks". Direction was BELOW and we were scanning LEFT but no header cell was found in the specified range.
         """
-
-Scenario: Create a complex series of WITHIN dimensional lookups
-    Given we load a file named "complexwithinexample.xls"
-    And select the sheet "Sheet1"
-    And we define cell selections as
-        | key               | value                                                    |  
-        | observations      | tab.excel_ref("C4:J35").is_not_blank()                   |
-        | month             | tab.excel_ref("A").one_of(["Jan", "Jul"])                |
-        | year              | tab.excel_ref("A").one_of( ["2019.0", "2020.0", "2021"]  |
-    And we define the dimensions as
-        """
-        HDim(month, "Month", WITHIN(below=1, above=6), LEFT)
-        HDim(month, "Year", WITHIN(below=2, above=5), LEFT)
-        """
-    Then the lookup from an observation in cell "D8" to the dimension "Month" returns "{<A5 'Jan'>}"
-    And the lookup from an observation in cell "D8" to the dimension "Year" returns "{<A6 '2019.0'>}"
-    And the lookup from an observation in cell "D10" to the dimension "Month" returns "{<A11 'Jul'>}"
-    And the lookup from an observation in cell "D10" to the dimension "Year" returns "{<A12 '2019.0'>}"
-    And the lookup from an observation in cell "H35" to the dimension "Month" returns "{<A29 'Jan'>}"
-    And the lookup from an observation in cell "H35" to the dimension "Year" returns "{<A30 '2021.0'>}"

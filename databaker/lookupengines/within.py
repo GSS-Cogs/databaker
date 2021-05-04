@@ -1,4 +1,3 @@
-
 from databaker.constants import ABOVE, BELOW, UP, DOWN, LEFT, RIGHT, DIRECTION_DICT
 from databaker.lookupengines.generic import override_looked_up_cell, unpack_callables
 
@@ -59,8 +58,8 @@ class WITHIN(object):
                     self.direction_of_travel = RIGHT
                     break
                 if k == "right":
-                    self.starting_offset = kwargs["right"]
-                    self.ending_offset = kwargs["left"]
+                    self.starting_offset = -kwargs["right"]
+                    self.ending_offset = -kwargs["left"]
                     self.direction_of_travel = LEFT
                     break
         elif above is not None:
@@ -71,8 +70,8 @@ class WITHIN(object):
                     self.direction_of_travel = DOWN
                     break
                 if k == "below":
-                    self.starting_offset = kwargs["below"]
-                    self.ending_offset = kwargs["above"]
+                    self.starting_offset = -kwargs["below"]
+                    self.ending_offset = -kwargs["above"]
                     self.direction_of_travel = UP
                     break
         else:
@@ -256,7 +255,6 @@ class WithinEngine(object):
                 potential_cell = [x for x in cell_bag if x.x == x_offset and x.y == y_offset]
                 if len(potential_cell) == 1: 
                     sequence.append(potential_cell[0])
-
             return sequence
         
         #Scenario 1
@@ -304,31 +302,54 @@ class WithinEngine(object):
         # TODO - think!
         # We've got things into the right sequence so this will work, but given we know the absolute width and height of the
         # table can we shortcut this? Feels like there might be some logic hack to be found here to start us off a better informed /
-        # close to the mark point in the sequence.  
+        # close to the mark point in the sequence. 
         found_cell = None
         for sequenced_cell in self.sequence:
-            if self.direction == ABOVE:
+            if self.direction == BELOW and self.direction_of_travel == RIGHT:
                 if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
-                    if sequenced_cell.y < cell.y: # We're looking above, the dimenion option needs to above the cell
-                        found_cell = sequenced_cell
-                    found_cell = sequenced_cell
-                    break
-
-            elif self.direction == BELOW:
-                if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
-                    if sequenced_cell.y > cell.y: # We're looking below, the dimenion option needs to below the cell
+                    if sequenced_cell.y > cell.y: # We're looking below, the dimension option needs to below the cell
                         found_cell = sequenced_cell
                         break
 
-            elif self.direction == LEFT:
+            elif self.direction == BELOW and self.direction_of_travel == LEFT:
+                if sequenced_cell.x <= cell.x-self.starting_offset and sequenced_cell.x >= cell.x+self.ending_offset:
+                    if sequenced_cell.y > cell.y: # We're looking below, the dimension option needs to below the cell
+                        found_cell = sequenced_cell
+                        break
+
+            elif self.direction == ABOVE and self.direction_of_travel == RIGHT:
+                if sequenced_cell.x >= cell.x-self.starting_offset and sequenced_cell.x <= cell.x+self.ending_offset:
+                    if sequenced_cell.y < cell.y: # We're looking above, the dimension option needs to above the cell
+                        found_cell = sequenced_cell
+                        break
+
+            if self.direction == ABOVE and self.direction_of_travel == LEFT:
+                if sequenced_cell.x <= cell.x-self.starting_offset and sequenced_cell.x >= cell.x+self.ending_offset:
+                    if sequenced_cell.y < cell.y: # We're looking above, the dimension option needs to above the cell
+                        found_cell = sequenced_cell
+                        break
+
+            elif self.direction == LEFT and self.direction_of_travel == ABOVE:     
+                if sequenced_cell.y <= cell.y-self.starting_offset and sequenced_cell.y >= cell.y+self.ending_offset:
+                    if sequenced_cell.x < cell.x: # We're looking left, the dimension option needs to left of the cell
+                        found_cell = sequenced_cell
+                        break
+
+            elif self.direction == LEFT and self.direction_of_travel == BELOW:     
                 if sequenced_cell.y >= cell.y-self.starting_offset and sequenced_cell.y <= cell.y+self.ending_offset:
-                    if sequenced_cell.x < cell.x: # We're looking left, the dimenion option needs to left of the cell
+                    if sequenced_cell.x < cell.x: # We're looking left, the dimension option needs to left of the cell
                         found_cell = sequenced_cell
                         break
-                    
-            elif self.direction == RIGHT:
-                if sequenced_cell.y <= cell.y-self.starting_offset and sequenced_cell.y >= cell.x+self.ending_offset:
-                    if sequenced_cell.x > cell.x: # We're looking right, the dimenion option needs to be right of cell
+
+            elif self.direction == RIGHT and self.direction_of_travel == ABOVE:
+                if sequenced_cell.y <= cell.y-self.starting_offset and sequenced_cell.y >= cell.y+self.ending_offset:
+                    if sequenced_cell.x > cell.x: # We're looking right, the dimension option needs to be right of cell
+                        found_cell = sequenced_cell
+                        break
+
+            elif self.direction == RIGHT and self.direction_of_travel == BELOW:
+                if sequenced_cell.y >= cell.y-self.starting_offset and sequenced_cell.y <= cell.y+self.ending_offset:
+                    if sequenced_cell.x > cell.x: # We're looking right, the dimension option needs to be right of cell
                         found_cell = sequenced_cell
                         break
 
