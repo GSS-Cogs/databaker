@@ -23,7 +23,7 @@ Feature: Apply callables passed in at runtime to a dimension constructor
             | "bakingtestdataset.xls"     |
             | "bakingtestdataset.xlsx"    |
 
-    Scenario Outline: Apply funa callable to a dimension constructor for a DIRECT engine
+    Scenario Outline: Apply a callable to a dimension constructor for a DIRECT engine
         Given we load a file named <File Name>
         And select the sheet "Sheet1"
         And we define cell selections as
@@ -44,20 +44,23 @@ Feature: Apply callables passed in at runtime to a dimension constructor
             | "bakingtestdataset.xls"     |
             | "bakingtestdataset.xlsx"    | 
 
-     Given we load a file named "bakingtestdataset.xls"
-    And select the sheet "Sheet1"
-    And we define cell selections as
-        | key               | value                                   |  
-        | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
-        | observations      | tab.excel_ref("C6:I25")                 |
-    And we define the dimensions as
-        """
-        HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), ABOVE, apply=lambda x: f'I love {x} a whole bunch')
-        """
-    Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns the value "I love Cats a whole bunch"
-    And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns the value "I love Cats a whole bunch"
-    And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns the value "I love Dogs a whole bunch"
-    And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns the value "I love Dogs a whole bunch"
+    
+    Scenario Outline: Apply a callable to a dimension constructor for a WITHIN engine
+
+        Given we load a file named <File Name>
+        And select the sheet "Sheet1"
+        And we define cell selections as
+            | key               | value                                   |  
+            | cats_and_dogs     | tab.excel_ref("3").is_not_blank()       |
+            | observations      | tab.excel_ref("C6:I25")                 |
+        And we define the dimensions as
+            """
+            HDim(cats_and_dogs, "Cats And Dogs", WITHIN(right=2, left=1), ABOVE, apply=lambda x: f'I love {x} a whole bunch')
+            """
+        Then the lookup from an observation in cell "C25" to the dimension "Cats And Dogs" returns the value "I love Cats a whole bunch"
+        And the lookup from an observation in cell "F25" to the dimension "Cats And Dogs" returns the value "I love Cats a whole bunch"
+        And the lookup from an observation in cell "G25" to the dimension "Cats And Dogs" returns the value "I love Dogs a whole bunch"
+        And the lookup from an observation in cell "I25" to the dimension "Cats And Dogs" returns the value "I love Dogs a whole bunch"
 
 
     Scenario Outline: Apply multiple ordered callables to a dimension constructor for a DIRECT engine

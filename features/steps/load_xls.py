@@ -288,7 +288,7 @@ Expected:
     """
     assert values_got == values_expected, msg
 
-@given('we attempt to extract the dimensions, capturing the first exception as')
+@step('we attempt to extract the dimensions, capturing the first exception as')
 def step_impl(context):
     try:
         context.tidy_sheet.topandas()
@@ -307,7 +307,6 @@ Expected:
 
 
 @then('the lookup from an observation in cell "{ob_cell_excel_ref}" to the dimension "{dimension_name}" returns "{expecting}"')
-@catch_all
 def step_impl(context, ob_cell_excel_ref, dimension_name, expecting):
     dimension = [x for x in context.dimensions if x.name == dimension_name]
     assert len(dimension) == 1, f'Could not find a dimension named {dimension_name}'
