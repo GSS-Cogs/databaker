@@ -8,6 +8,8 @@ import databaker.constants
 from databaker.constants import *      # also brings in template
 import databaker.overrides as overrides       # warning: injects additional class functions into xypath and messytables
 
+import pandas as pd
+
 from pathlib import PosixPath
 
 # core classes and functionality
@@ -35,6 +37,15 @@ def loadxlstabs(input, sheetids="*", verbose=True):
             tableset = XLSXTableSet(filename=input_file_name, fileobj=input_file_obj)
         elif str(input_file_name).endswith(".xls"):
             tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
+        elif str(input_file_name).endswith(".ods"):
+            df_dict = pd.read_excel(str(input_file_name), engine="odf", sheet_name=None)
+            from pandas import ExcelWriter
+            w = ExcelWriter("ods_as_xlsx.xlsx")
+            for key in df_dict.keys():
+                ods_as_xlsx = df_dict[key].to_excel(w, sheet_name=key)
+                w.save()
+            tableset = XLSXTableSet(filename="ods_as_xlsx.xlsx", fileobj=ods_as_xlsx)
+
     except Exception as err:
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')

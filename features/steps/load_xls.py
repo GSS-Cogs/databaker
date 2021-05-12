@@ -63,9 +63,7 @@ def step_impl(context, sheet_wanted):
 
 @then(u'the output "{thing_wanted}" should be equal to')
 def step_impl(context, thing_wanted):
-
     expected_output = context.text
-    #actual_output = context.databaker_outputs[thing_wanted][0].name
     actual_output = context.tabs[2].name
     assert expected_output == actual_output, "{} \n\ndoes not match the expected output \n\n {}\n".format(str(actual_output), str(expected_output))
 
