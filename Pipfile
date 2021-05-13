@@ -13,7 +13,7 @@ databaker = {editable = true,path = "."}
 pandas = "*"
 openpyxl = "*"
 python-dateutil = "*"
-xypath = "==1.1.0"
+xypath = "==1.1.1"
 odfpy = "*"
 
 [requires]
