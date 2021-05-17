@@ -19,6 +19,7 @@ from databaker.jupybakehtml import savepreviewhtml
 
 from databaker.loaders.xlsx import XLSXTableSet
 from databaker.loaders.xls import XLSTableSet
+from pandas import ExcelWriter
 
 def loadxlstabs(input, sheetids="*", verbose=True):
 
@@ -38,15 +39,33 @@ def loadxlstabs(input, sheetids="*", verbose=True):
         elif str(input_file_name).endswith(".xls"):
             tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
         elif str(input_file_name).endswith(".ods"):
-            df_dict = pd.read_excel(str(input_file_name), engine="odf", sheet_name=None)
-            from pandas import ExcelWriter
-            w = ExcelWriter("ods_as_xlsx.xlsx")
-            for key in df_dict.keys():
-                ods_as_xlsx = df_dict[key].to_excel(w, sheet_name=key)
-                w.save()
-            tableset = XLSXTableSet(filename="ods_as_xlsx.xlsx", fileobj=ods_as_xlsx)
+
+            # Explanation - delete this before you push final please -mike-
+            # We're reading the input file object here (our use case) but we need
+            # to also support reading a file path
+            # logic will be something like "if is_file_object" (the below line) else: 
+            # ....something similar to what you had before. 
+
+            df_dict = pd.read_excel(input_file_obj, engine="odf", sheet_name=None)
+
+            # Explanation - delete this before you push final please -mike-
+            # so we're actually "saving" to an in-memory BytesIO object rather than
+            # a concrete file, this gets us around saving things to disk
+            # A BytesIO is just a thing of bytes, and has a read() method (so will satisfy
+            # the handling of file_objects in the table loader later)
+            # NOTE - we'll always nee to also write TO bytes regardless of if it came in 
+            # as filepath or file object
+
+            # had to install xlsxwriter, not sure if thats necessary, have a play
+            w = pd.ExcelWriter(BytesIO(), engine='xlsxwriter') 
+            for sheet_name in df_dict:
+                df_dict[sheet_name].to_excel(w, sheet_name=sheet_name)
+            w.save()
+            tableset = XLSXTableSet(fileobj=w.book.filename)
 
     except Exception as err:
+        raise err
+
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
                         'Falling through to default messytables table loader.')
         tableset = messytables.excel.XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
