@@ -61,8 +61,13 @@ def step_impl(context, sheet):
 def step_impl(context, sheet_wanted):
     context.tab_selected = [x for x in context.tabs if x.name == sheet_wanted][0]
 
-@then(u'the output "{thing_wanted}" should be equal to')
-def step_impl(context, thing_wanted):
+@given(u'we load a file from the path "{path}"')
+def step_impl(context, path):
+    with open(path, "r") as f:
+        context.tabs = loadxlstabs(f)
+
+@then(u'an expected output should be equal to')
+def step_impl(context):
     expected_output = context.text
     actual_output = context.tabs[2].name
     assert expected_output == actual_output, "{} \n\ndoes not match the expected output \n\n {}\n".format(str(actual_output), str(expected_output))

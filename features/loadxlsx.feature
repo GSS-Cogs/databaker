@@ -9,7 +9,7 @@ Feature: Load xlsx files
     "3. NUTS2, industry", "4. NUTS2, industry, destination", "5. NUTS3, destination",
     "6. City Region, industry", "7. City Region, industry, dest.", "8. Travel", "9. Tidy format"]
     """
-    And the output "some_name" should be equal to:
+    And an expected output should be equal to:
     """
     1. NUTS1, industry
     """
