@@ -15,7 +15,8 @@ Feature: Define dimension using bag.is_non_number()
         """
 
         Examples: File Types
-            | File Name                         |
+            | File Name                       |
             | "balanceofpayments2020q1.xls"     |
             | "balanceofpayments2020q1.xlsx"    |
+            | "balanceofpayments2020q1.ods"     |
   

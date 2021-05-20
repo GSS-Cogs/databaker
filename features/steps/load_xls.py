@@ -61,11 +61,6 @@ def step_impl(context, sheet):
 def step_impl(context, sheet_wanted):
     context.tab_selected = [x for x in context.tabs if x.name == sheet_wanted][0]
 
-@given(u'we load a file from the path "{path}"')
-def step_impl(context, path):
-    with open(path, "r") as f:
-        context.tabs = loadxlstabs(f)
-
 @then(u'an expected output should be equal to')
 def step_impl(context):
     expected_output = context.text
@@ -137,6 +132,7 @@ def step_impl(context):
 #This is the function which takes ages because it now loops for all dims and obs.
 @given(u'we convert the ConversionSegment object into a pandas dataframe.')
 def step_impl(context):
+    print(context.tab_selected)
     context.df = context.tidy_sheet.topandas()
 
 

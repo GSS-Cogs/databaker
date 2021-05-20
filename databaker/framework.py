@@ -39,13 +39,14 @@ def loadxlstabs(input, sheetids="*", verbose=True):
         elif str(input_file_name).endswith(".xls"):
             tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
         elif str(input_file_name).endswith(".ods"):
-            if type(input_file_obj) is not None:
-                df_dict = pd.read_excel(input_file_name, engine="odf", sheet_name=None)
-                w = pd.ExcelWriter(BytesIO(), engine='xlsxwriter') 
-                for sheet_name in df_dict:
-                    df_dict[sheet_name].to_excel(w, sheet_name=sheet_name)
-                w.save()
-                tableset = XLSXTableSet(fileobj=w.book.filename)
+            df_dict = pd.read_excel(input_file_name, engine="odf", sheet_name=None)
+            w = pd.ExcelWriter(BytesIO(), engine='xlsxwriter') 
+            #for sheet_name in df_dict:
+            for key in df_dict.keys():
+                df_dict[key].to_excel(w, sheet_name=key, index=False)
+                #df_dict[sheet_name].to_excel(w, sheet_name=sheet_name)
+            w.save()
+            tableset = XLSXTableSet(fileobj=w.book.filename)
 
     except Exception as err:
         logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '

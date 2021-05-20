@@ -15,6 +15,7 @@ Feature: Define dimension using bag.one_of()
         """
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        | 
+            | "bakingtestdataset.ods"         |
