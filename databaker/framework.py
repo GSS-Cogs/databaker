@@ -40,11 +40,9 @@ def loadxlstabs(input, sheetids="*", verbose=True):
             tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
         elif str(input_file_name).endswith(".ods"):
             df_dict = pd.read_excel(input_file_name, engine="odf", sheet_name=None)
-            w = pd.ExcelWriter(BytesIO(), engine='xlsxwriter') 
-            #for sheet_name in df_dict:
+            w = pd.ExcelWriter(BytesIO()) 
             for key in df_dict.keys():
                 df_dict[key].to_excel(w, sheet_name=key, index=False)
-                #df_dict[sheet_name].to_excel(w, sheet_name=sheet_name)
             w.save()
             tableset = XLSXTableSet(fileobj=w.book.filename)
 
