@@ -28,7 +28,7 @@ conf = dict(
     namespace_packages=[],
     include_package_data=False,
     zip_safe=False,
-    install_requires=['docopt', 'xypath>=1.1.1', 'xlutils', 'pyhamcrest', 'xlswriter'],
+    install_requires=['docopt', 'xypath>=1.1.1', 'xlutils', 'pyhamcrest', 'xlsxwriter'],
     tests_require=[],
     entry_points={
         'console_scripts': [
