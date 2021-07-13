@@ -17,6 +17,7 @@ Feature: Define a dimension as a range of values from a cell reference.
     """
 
     Examples: File Types
-      | File Name                   |
-      | "bakingtestdataset.xls"     |
-      | "bakingtestdataset.xlsx"    | 
+      | File Name                       |
+      | "bakingtestdataset.xls"         |
+      | "bakingtestdataset.xlsx"        | 
+      | "bakingtestdataset.ods"         | 

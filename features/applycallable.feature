@@ -19,9 +19,10 @@ Feature: Apply callables passed in at runtime to a dimension constructor
         And the lookup from an observation in cell "C23" to the dimension "Month" returns the value "I am the month: Oct"
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        |
+            | "bakingtestdataset.ods"         |
 
     Scenario Outline: Apply a callable to a dimension constructor for a DIRECT engine
         Given we load a file named <File Name>
@@ -40,9 +41,11 @@ Feature: Apply callables passed in at runtime to a dimension constructor
         And the lookup from an observation in cell "G8" to the dimension "Top Dims" returns the value "Dim 4 got this text added."
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    | 
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        |
+            | "bakingtestdataset.ods"         |
+
 
     
     Scenario Outline: Apply a callable to a dimension constructor for a WITHIN engine
@@ -80,6 +83,8 @@ Feature: Apply callables passed in at runtime to a dimension constructor
         And the lookup from an observation in cell "G8" to the dimension "Top Dims" returns the value "Dim 4 text added."
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    | 
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        | 
+            | "bakingtestdataset.ods"         |
+

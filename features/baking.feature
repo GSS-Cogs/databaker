@@ -39,9 +39,11 @@ Feature: Produce a pandas dataframe containing all data values in the format of 
         Then the two dataframes should be identical.
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        | 
+            | "bakingtestdataset.ods"         |
+            
 
     Scenario Outline: Complete the databaking process from a file object - produce a correct dataframe
         Given we use a file object created from <File Name>
@@ -79,6 +81,7 @@ Feature: Produce a pandas dataframe containing all data values in the format of 
         Then the two dataframes should be identical.
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        | 
+            | "bakingtestdataset.ods"         |

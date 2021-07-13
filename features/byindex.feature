@@ -18,6 +18,7 @@ Feature: Define a dimension by accessing the element at index n in a bag of cell
         """
 
         Examples: File Types
-            | File Name                   |
-            | "bakingtestdataset.xls"     |
-            | "bakingtestdataset.xlsx"    |
+            | File Name                       |
+            | "bakingtestdataset.xls"         |
+            | "bakingtestdataset.xlsx"        | 
+            | "bakingtestdataset.ods"         |

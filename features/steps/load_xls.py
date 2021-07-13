@@ -48,24 +48,22 @@ def catch_all(func):
 def step_impl(context, sheet):
     path_to_sheet = get_fixture(sheet)
     context.last_xls_loaded = path_to_sheet
-    context.tabs = loadxlstabs(path_to_sheet)
+    context.tabs = loadxlstabs(path_to_sheet, fallback_loader=False)
 
 @given(u'we use a file object created from "{sheet}"')
 def step_impl(context, sheet):
     path_to_sheet = get_fixture(sheet)
     context.last_xls_loaded = path_to_sheet
     with open(path_to_sheet, 'rb') as f:
-        context.tabs = loadxlstabs(f)
+        context.tabs = loadxlstabs(f, fallback_loader=False)
 
 @given('select the sheet "{sheet_wanted}"')
 def step_impl(context, sheet_wanted):
     context.tab_selected = [x for x in context.tabs if x.name == sheet_wanted][0]
 
-@then(u'the output "{thing_wanted}" should be equal to')
-def step_impl(context, thing_wanted):
-
+@then(u'an expected output should be equal to')
+def step_impl(context):
     expected_output = context.text
-    #actual_output = context.databaker_outputs[thing_wanted][0].name
     actual_output = context.tabs[2].name
     assert expected_output == actual_output, "{} \n\ndoes not match the expected output \n\n {}\n".format(str(actual_output), str(expected_output))
 
@@ -134,6 +132,7 @@ def step_impl(context):
 #This is the function which takes ages because it now loops for all dims and obs.
 @given(u'we convert the ConversionSegment object into a pandas dataframe.')
 def step_impl(context):
+    print(context.tab_selected)
     context.df = context.tidy_sheet.topandas()
 
 

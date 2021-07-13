@@ -18,3 +18,4 @@ Feature: Define dimension using bag.spaceprefix(count)
             | File Name                         |
             | "balanceofpayments2020q1.xls"     |
             | "balanceofpayments2020q1.xlsx"    |
+            | "balanceofpayments2020q1.ods"     |

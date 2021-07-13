@@ -5,8 +5,11 @@ import messytables
 import xypath
 import xypath.loader
 import databaker.constants
-from databaker.constants import *      # also brings in template
+from databaker.constants import *             # also brings in template
 import databaker.overrides as overrides       # warning: injects additional class functions into xypath and messytables
+
+import pandas as pd
+from pandas import ExcelWriter
 
 from pathlib import PosixPath
 
@@ -18,7 +21,7 @@ from databaker.jupybakehtml import savepreviewhtml
 from databaker.loaders.xlsx import XLSXTableSet
 from databaker.loaders.xls import XLSTableSet
 
-def loadxlstabs(input, sheetids="*", verbose=True):
+def loadxlstabs(input, sheetids="*", verbose=True, fallback_loader= True):
 
     is_file_object = not isinstance(input, str) and not isinstance(input, PosixPath)
     input_file_name = input.name if is_file_object else input
@@ -35,11 +38,22 @@ def loadxlstabs(input, sheetids="*", verbose=True):
             tableset = XLSXTableSet(filename=input_file_name, fileobj=input_file_obj)
         elif str(input_file_name).endswith(".xls"):
             tableset = XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
+        elif str(input_file_name).endswith(".ods"):
+            df_dict = pd.read_excel(input_file_name, engine="odf", sheet_name=None)
+            w = pd.ExcelWriter(BytesIO(), engine='xlsxwriter') 
+            for key in df_dict.keys():
+                df_dict[key].to_excel(w, sheet_name=key, index=False)
+            w.save()
+            tableset = XLSXTableSet(fileobj=w.book.filename)
+
     except Exception as err:
-        logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
-                        'Falling through to default messytables table loader.')
-        tableset = messytables.excel.XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
-    
+        if fallback_loader:
+            logging.warning(f'Internal table loader failure with exception:\n\n {str(err)}\n\n. '
+                            'Falling through to default messytables table loader.')
+            tableset = messytables.excel.XLSTableSet(filename=input_file_name, fileobj=input_file_obj)
+        else:
+            raise err
+        
     tabs = list(xypath.loader.get_sheets(tableset, sheetids))
     assert len(tabs) > 0, f'Aborting. Unable to acquire any data tables'
     
