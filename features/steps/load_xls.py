@@ -48,14 +48,14 @@ def catch_all(func):
 def step_impl(context, sheet):
     path_to_sheet = get_fixture(sheet)
     context.last_xls_loaded = path_to_sheet
-    context.tabs = loadxlstabs(path_to_sheet)
+    context.tabs = loadxlstabs(path_to_sheet, fallback_loader=False)
 
 @given(u'we use a file object created from "{sheet}"')
 def step_impl(context, sheet):
     path_to_sheet = get_fixture(sheet)
     context.last_xls_loaded = path_to_sheet
     with open(path_to_sheet, 'rb') as f:
-        context.tabs = loadxlstabs(f)
+        context.tabs = loadxlstabs(f, fallback_loader=False)
 
 @given('select the sheet "{sheet_wanted}"')
 def step_impl(context, sheet_wanted):
